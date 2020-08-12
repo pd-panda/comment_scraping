@@ -29,7 +29,7 @@ class GraphView(BoxLayout):
         self.add_widget(self.graph_plot_sample())
 
     def graph_plot_sample(self):
-        self.fig= self.df_glaph(self.csv_df("data1.csv"))
+        self.fig= self.df_graph(self.csv_df("data1.csv"))
         return self.fig.canvas
     
     #csvファイルをデータフレームに変換
@@ -67,7 +67,7 @@ class GraphView(BoxLayout):
         return num,label
 
     #グラフ描画
-    def print_glaph(self,num,label):
+    def print_graph(self,num,label):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
  
@@ -83,14 +83,14 @@ class GraphView(BoxLayout):
         return str(dt_now)
 
     #データフレームからグラフの作成
-    def df_glaph(self, df) :
+    def df_graph(self, df) :
         time = df['time']
 
     #グラフ用データ作成
         result =  self.make_data(time)
 
     #グラフ表示部分
-        fig = self.print_glaph(result[0],result[1])
+        fig = self.print_graph(result[0],result[1])
 
     #現在時間のからファイル名作成
         #pngname = self.get_current_time() +'.png'
@@ -107,7 +107,7 @@ class GraphView(BoxLayout):
                 shutil.copyfile(path + '/' + row, "./"+row)
 
     #直下ディレクトリ内のcsvファイルからグラフを作成&csvファイルの削除
-    def make_glaph():
+    def make_graph():
         path = '.'
         files = os.listdir(path)
     #path内にあるファイルすべて取得
@@ -118,7 +118,7 @@ class GraphView(BoxLayout):
                 df = csv_df(row)
             
             #データフレーム型からグラフを作成直下ディレクトリに保存
-                df_glaph(df)
+                df_graph(df)
             
             #使い終わったcsvファイルの削除
                 os.remove(row)
@@ -139,7 +139,7 @@ class GraphView(BoxLayout):
         copy_csv(path_in)
 
     #直下にグラフ作成(使い終わってcsvファイルの削除)
-        make_glaph()
+        make_graph()
 
     #指定のファイルにpngデータを移動
         move_png(path_out)
