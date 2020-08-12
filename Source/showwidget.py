@@ -24,7 +24,7 @@ import sys, os
 import pandas as pd
 
 from Source.commentscraper import Scraper
-from Source.class_graph import GraphView
+from Source.classgraph import GraphView
 
 scr = Scraper()
 glp = GraphView()
