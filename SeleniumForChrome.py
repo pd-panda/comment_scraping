@@ -47,7 +47,7 @@ def get_html_from_url(url):
         print('do something')
     except TimeoutException:
         print("timeout!!!!")
-        raise
+        sys.exit(1)
 
     # HTMLを文字コードをUTF-8に変換したものを返す
     return driver.page_source.encode('utf-8')

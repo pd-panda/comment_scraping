@@ -1,0 +1,200 @@
+ShowWidget:
+
+<ShowWidget>:
+    #:set imgdata './Source/image/lefton.png'
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size: root.size
+
+        BoxLayout:
+            orientation: 'vertical'
+            #orientation: 'horizontal'
+            #size: root.size
+            size_hint_x: 0.325
+
+            BoxLayout:
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Image:
+                    size_hint_y: 0.15
+                    source: './Source/image/mierulogo.png'
+
+                TabbedPanel:
+                    do_default_tab: False
+                    size_hint_y: 0.55
+                    background_color: [0,0,0,0]
+                    canvas.before: 
+                        Rectangle: 
+                            pos: self.pos 
+                            size: self.size 
+                            source: root.source
+                    TabbedPanelItem:
+                        text:'ルーム名で\n実行'
+                        #size_hint: (None, None) 
+                        tab_pos: 'top_mid'
+                        color: [0.23,0.23,0.23,1]
+                        background_color: [1,1,1,0]
+                        font_size: 24
+                        #halign: 'center'
+                        on_release: root.buttonClickedroom()
+                        #:set imgdata './Source/image/lefton.png'
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint_y: 1
+                            padding: [50,20, 50, 20]
+                            spacing: 25
+
+                            Label:
+                                text: "ルーム名"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.35
+                                size_hint_y: 0.05
+                                font_size: 24
+
+                            BoxLayout:
+                                orientation: 'horizontal'
+                                size_hint_y: 0.2
+                                Label:
+                                    text: "#"
+                                    size_hint_y: 0.7
+                                    color: [0.23,0.23,0.23,1]
+                                    size_hint_x: 0.1
+                                    font_size: 24
+                                TextInput:
+                                    multiline: True
+                                    size_hint_x: 0.9
+                                    size_hint_y: 0.7
+                                    height: self.line_height + self.padding[1] + self.padding[3] + 10
+                                    font_size: 24
+
+                            Label:
+                                text: "Error:\nああああああ\nあああ"
+                                color: [1,0,0,1]
+                                font_size: 24
+                                text_size: self.size
+                                size_hint_y: 0.5
+                                halign: 'left'
+                                valign: 'top'
+                            BoxLayout:
+                                size_hint_y: 0.25
+                                orientation: 'vertical'
+                                padding: [60,0, 60, 0]
+                                Button:
+                                    id: button1
+                                    background_normal: './Source/image/buttonimg.png'
+                                    background_down: './Source/image/downbuttonimg.png'
+                                    on_press: root.buttonClickedroomDone()  # ボタンをクリックした時にpython側の関数を呼ぶ
+                    TabbedPanelItem:
+                        tab_pos: 'top_mid'
+                        text: 'ルーム名で\n実行'
+                        color: [0.23,0.23,0.23,1]
+                        #size_hint: (None, None) 
+                        background_color: [1,1,1,0]
+                        font_size: 24
+                        #halign: 'center'
+                        on_release: root.buttonClickedfile()
+                        #:set imgdata './Source/image/righton.png'
+                        BoxLayout:
+                            orientation: 'vertical'
+                            size_hint_y: 1
+                            padding: [50,20, 50, 20]
+                            spacing: 25
+
+                            Label:
+                                text: "ファイル名"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.35
+                                size_hint_y: 0.05
+                                font_size: 24
+
+                            BoxLayout:
+                                orientation: 'horizontal'
+                                size_hint_y: 0.2
+                                Label:
+                                    text: "#"
+                                    size_hint_y: 0.7
+                                    color: [0.23,0.23,0.23,1]
+                                    size_hint_x: 0.1
+                                    font_size: 24
+                                TextInput:
+                                    multiline: True
+                                    size_hint_x: 0.9
+                                    size_hint_y: 0.7
+                                    height: self.line_height + self.padding[1] + self.padding[3] + 10
+                                    font_size: 24
+
+                            Label:
+                                text: "Error:\nああああああ\nあああ"
+                                color: [1,0,0,1]
+                                font_size: 24
+                                text_size: self.size
+                                size_hint_y: 0.5
+                                halign: 'left'
+                                valign: 'top'
+                            BoxLayout:
+                                size_hint_y: 0.25
+                                orientation: 'vertical'
+                                padding: [60,0, 60, 0]
+                                Button:
+                                    id: button1
+                                    background_normal: './Source/Source/image/buttonimg.png'
+                                    background_down: './Source/Source/image/downbuttonimg.png'
+                                    on_press: root.buttonClicked1()  # ボタンをクリックした時にpython側の関数を呼ぶ
+
+                BoxLayout:
+                    size_hint_y: 0.3
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 1
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+        BoxLayout:
+            orientation: 'vertical'
+            #orientation: 'horizontal'
+            #size: root.size
+            size_hint_x: 0.675
+
+            #Image:
+            #    source: 'sakotomo.png'
+            #    size_hint_y: 0.5
+            GraphView:
+                size_hint_y: 0.5
+
+            Label:
+                text: root.text
+                color: root.color
+                size_hint_y: 0.2
+                font_size: 68
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: 0.3
+                padding: 20,30,20, 10
+                Button:
+                    id: button1
+                    text: "いい感じ"
+                    font_size: 68
+                    on_press: root.buttonClicked1()  # ボタンをクリックした時にpython側の関数を呼ぶ
+                Button:
+                    id: button2
+                    text: "フツー"
+                    font_size: 68
+                    on_press: root.buttonClicked2()
+                Button:
+                    id: button3
+                    text: "しあわせ〜"
+                    font_size: 68
+                    on_press: root.buttonClicked3()
