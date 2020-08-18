@@ -1,6 +1,6 @@
 # チャット可視化アプリ「コメント見える君」 
 
-<img width="626" alt="コメント見える君" src="https://user-images.githubusercontent.com/20110372/90475951-7ccc5800-e163-11ea-87c2-e70765a87ffe.png">
+<img width="400px" alt="コメント見える君" src="https://user-images.githubusercontent.com/20110372/90475951-7ccc5800-e163-11ea-87c2-e70765a87ffe.png">
 
 ## はじめに
 感染症拡大の影響で、オンラインイベントの開催が増加しています。<BR>
