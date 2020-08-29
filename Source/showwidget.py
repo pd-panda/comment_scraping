@@ -23,10 +23,10 @@ import sys, os
 
 import pandas as pd
 
-from Source.commentscraper import Scraper
+#from Source.commentscraper import Scraper
 from Source.classgraph import GraphView
 
-scr = Scraper()
+#scr = Scraper()
 glp = GraphView()
 
 # デフォルトに使用するフォントを変更する
@@ -74,10 +74,10 @@ class ShowWidget(Widget):
         print("buttonClickedfile!!!")
 
     def buttonClickedroomDone(self):
-        print("scraper start!")
-        t1 = threading.Thread(target=scr.main, args=["カフカ読書会"])
-        t1.start()
-        print("scraper end!!!")
+        #print("scraper start!")
+        #t1 = threading.Thread(target=scr.main, args=["カフカ読書会"])
+        #t1.start()
+        #print("scraper end!!!")
 
     def plottest(self):
         glp.main()
