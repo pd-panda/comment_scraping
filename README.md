@@ -1,5 +1,7 @@
 # チャット可視化アプリ「コメント見える君」 
 
+<img width="174" alt="mierulogo" src="https://user-images.githubusercontent.com/20110372/92326828-ecad6e80-f08f-11ea-9afb-234a2af78d83.png">
+
 <img width="400px" alt="コメント見える君" src="https://user-images.githubusercontent.com/20110372/90475951-7ccc5800-e163-11ea-87c2-e70765a87ffe.png"><BR>
 
 ## はじめに
