@@ -18,17 +18,17 @@
 ### 1人1人のコメント量
 ![ダウンロード (4)](https://user-images.githubusercontent.com/40239635/92340494-8eb37200-f0f5-11ea-900a-2cc016982ba8.png)
 
-###単語ごとの出現数推移
+### 単語ごとの出現数推移
 ![5](https://user-images.githubusercontent.com/40239635/92339785-b6550b00-f0f2-11ea-8127-eb7e937dc71e.png)
 
-###ネガポジ推移
+### ネガポジ推移
 ![6](https://user-images.githubusercontent.com/40239635/92339784-b5bc7480-f0f2-11ea-9874-edb81122373c.png)
 
-###単語treemap
+### 単語treemap
 ![treemap](https://user-images.githubusercontent.com/40239635/92340436-4bf19a00-f0f5-11ea-8959-77eb104be806.png)
 
 
-##提供方法
+## 提供方法
 
 ズームを用いたオンラインでのイベント開催を行う。<BR>  
 しかしこの方法では以下のような問題点がある。<BR>  
