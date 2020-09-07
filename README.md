@@ -13,11 +13,25 @@
 
 ## プレビュー
 ### 単語ごとの出現数
-![graph1](https://user-images.githubusercontent.com/20110372/90669444-a503a600-e28c-11ea-9aa3-e177eccaa932.png)
+![7](https://user-images.githubusercontent.com/40239635/92339786-b6eda180-f0f2-11ea-8f42-f49cbdcf6740.png)
+
+### 1人1人のコメント量
+！[1人1人のコメント量]（https://user-images.githubusercontent.com/40239635/92339788-b7863800-f0f2-11ea-8984-bd1870dfbda8.png)
 
 
-## 提供方法
-Zoomを用いたオンラインでのイベント開催を行う。<BR>  
+###単語ごとの出現数推移
+![5](https://user-images.githubusercontent.com/40239635/92339785-b6550b00-f0f2-11ea-8127-eb7e937dc71e.png)
+
+###ネガポジ推移
+![6](https://user-images.githubusercontent.com/40239635/92339784-b5bc7480-f0f2-11ea-9874-edb81122373c.png)
+
+###単語treemap
+![treemap](https://user-images.githubusercontent.com/40239635/92340436-4bf19a00-f0f5-11ea-8959-77eb104be806.png)
+
+
+##提供方法
+
+ズームを用いたオンラインでのイベント開催を行う。<BR>  
 しかしこの方法では以下のような問題点がある。<BR>  
 * 参加者の反応が分かりにくい
 * 視覚的な情報が少ない
