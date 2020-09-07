@@ -16,8 +16,7 @@
 ![7](https://user-images.githubusercontent.com/40239635/92339786-b6eda180-f0f2-11ea-8f42-f49cbdcf6740.png)
 
 ### 1人1人のコメント量
-！[1人1人のコメント量]（https://user-images.githubusercontent.com/40239635/92339788-b7863800-f0f2-11ea-8984-bd1870dfbda8.png)
-
+![ダウンロード (4)](https://user-images.githubusercontent.com/40239635/92340494-8eb37200-f0f5-11ea-900a-2cc016982ba8.png)
 
 ###単語ごとの出現数推移
 ![5](https://user-images.githubusercontent.com/40239635/92339785-b6550b00-f0f2-11ea-8127-eb7e937dc71e.png)
