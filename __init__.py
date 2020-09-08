@@ -38,6 +38,33 @@ try:
 except ImportError:
   print("Trying to Install required module: selenium")
   os.system('conda install -c conda-forge selenium')
+  
+#ここから，内部処理用
+ 
+try:
+  import datetime
+except ImportError:
+  print("Trying to Install required module: datetime")
+  os.system('conda install -c trentonoliphant datetime')
+ 
+try:
+  import seaborn as sns
+except ImportError:
+  print("Trying to Install required module: datetime")
+  os.system('conda install -c conda-forge seaborn')
+
+try:
+  from collections import Counter, defaultdict
+except ImportError:
+  print("Trying to Install required module: datetime")
+  os.system('conda install -c auto counter')
+  
+try:
+  from collections import Counter, defaultdict
+except ImportError:
+  print("Trying to Install required module: datetime")
+  os.system('conda install -c auto counter')
+
 
 from Source.showwidget import TestApp
 
