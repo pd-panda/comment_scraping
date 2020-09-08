@@ -60,11 +60,16 @@ except ImportError:
   os.system('conda install -c auto counter')
   
 try:
-  from collections import Counter, defaultdict
+  import squarify
 except ImportError:
   print("Trying to Install required module: datetime")
-  os.system('conda install -c auto counter')
+  os.system('conda install -c conda-forge squarify')
 
+try:
+  from pyknp import Juman
+except ImportError:
+  print("Trying to Install required module: datetime")
+  os.system('conda install -c temporary-recipes pyknp')
 
 from Source.showwidget import TestApp
 
