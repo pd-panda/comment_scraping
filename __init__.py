@@ -50,26 +50,32 @@ except ImportError:
 try:
   import seaborn as sns
 except ImportError:
-  print("Trying to Install required module: datetime")
+  print("Trying to Install required module: seaborn")
   os.system('conda install -c conda-forge seaborn')
 
 try:
   from collections import Counter, defaultdict
 except ImportError:
-  print("Trying to Install required module: datetime")
+  print("Trying to Install required module: Counter, defaultdict")
   os.system('conda install -c auto counter')
   
 try:
   import squarify
 except ImportError:
-  print("Trying to Install required module: datetime")
+  print("Trying to Install required module: squarify")
   os.system('conda install -c conda-forge squarify')
 
 try:
   from pyknp import Juman
 except ImportError:
-  print("Trying to Install required module: datetime")
+  print("Trying to Install required module: Juman")
   os.system('conda install -c temporary-recipes pyknp')
+
+try:
+  import japanize_matplotlib
+except ImportError:
+  print("Trying to Install required module: japanize_matplotlib")
+  os.system('pip install japanize-matplotlib')
 
 from Source.showwidget import TestApp
 
