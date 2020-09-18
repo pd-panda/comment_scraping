@@ -1,0 +1,13 @@
+00:38:19	Yu Sasaki:	鈴木さん、文字が流れてないですね・・・
+02:24:52	ai1807:	三日目の講義動画、いつごろUPされますでしょうか？
+02:31:20	Yu Sasaki:	動画ですが、昼にはアップします、遅れており申し訳ありません！
+03:04:52	ai1807:	よろしくお願いいたします。　今回のスクール資料・動画はいつ頃までアーカイブされていますか？　（今後の学習に活用したく。）
+03:04:52	Kenji Nakashima:	まだです
+03:05:19	kosaka yuta:	dataフォルダをうまくpathに通したらいけました
+03:05:29	Kenji Nakashima:	隣の人ができているのでそっち見ます。
+03:05:47	TsuchizawaRin:	dataフォルダが作成されていなくて
+03:06:02	TsuchizawaRin:	ダウンロードもされないです..
+03:06:45	TsuchizawaRin:	dekimasita
+03:06:48	TsuchizawaRin:	できました
+03:06:58	TsuchizawaRin:	ありがとうございます。
+03:29:04	TsuchizawaRin:	https://gyazo.com/72e0057b151c637d9dbcc13e06ffc915

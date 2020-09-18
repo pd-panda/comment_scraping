@@ -27,14 +27,19 @@ from pyknp import Juman#
 #京都大学大学院情報学研究科知能情報学専攻黒橋・褚・村脇研究室 (http://nlp.ist.i.kyoto-u.ac.jp/)
 import warnings
 warnings.filterwarnings('ignore')
+sourcedir = "./Source"
 
-class data_glaph :
-"""-----------------------------------------------------------treemap---------------------------------------------------------"""
+class DataGraph:
+    #csvファイルをデータフレームに変換
+    def csv_df(self, fname):
+        df = pd.read_csv(os.path.join(sourcedir, fname))
+        return df
+#-----------------------------------------------------------treemap---------------------------------------------------------
 #------------------treemap出力用------------------------　
     #引数:データフレームとタイトル
-    def print_treemap(df,title) :
+    def print_treemap(self, df, title, fig, ax) :
         #ソート
-        df = rank_sort(df,False)
+        df = self.rank_sort(df,False)
 
         sns.set()
         matplotlib.rcParams['figure.figsize'] = (16.0, 9.0)
@@ -42,13 +47,13 @@ class data_glaph :
         style.use('ggplot')
         sns.set(font="IPAexGothic") #日本語フォント設定
 
-        fig, ax = plt.subplots()
+        #fig, ax = plt.subplots()
         # Colormap
         cmap = matplotlib.cm.Blues
 
         # Min and Max Values
         #割合作成後dfに追加
-        df = add_percent(df)
+        df = self.add_percent(df)
         mini = min(df["Population"])
         maxi = max(df["Population"])   
 
@@ -68,55 +73,59 @@ class data_glaph :
         ttl.set_position([.5, 1.05])
         # 背景色
         fig.set_facecolor('#eeffee')
-        plt.show()
+        #plt.show()
+        #fig, ax = plt.subplots()
+        #ax.plot(x, y, label="test")
 
 #-------------------割合作成後dfに追加----------------------
-    def add_percent(df) :
+    def add_percent(self, df) :
         s = df['point'].sum()
         df["Population"] = 0.0
 
         for i in range(len(df['point'])) :
             a = df['point'][i] /float(s) * 100.0
-            df["Population"][i] = a 
+            df["Population"][i] = a
 
         return df
-"""--------------------------------------------------------------------------------------------------------------------------------------"""
+#--------------------------------------------------------------------------------------------------------------------------------------
 
-"""-----------------------------------------------------------構文解析&データ作成---------------------------------------------------------"""
+#-----------------------------------------------------------構文解析&データ作成---------------------------------------------------------
 
 #------------コメントデータからデータ抽出＆データフレーム作成--------------
-    def string_word_point(df):
+    def string_word_point(self, df):
         jumanpp = Juman(jumanpp=False)
         tmp_word =[]
         df_time_word = pd.DataFrame(index=[], columns=['time','word']) #単語と時間のｄｆ
         df_word_point = pd.DataFrame(index=[], columns=['word','point'])#単語とその出現数のｄｆ
         df_time_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のコメント数のｄｆ
-
+        #print(df_word_point)
         for i in range(len(df)):
+            #print("記号削除前")
+            #print(df_word_point)
             #記号削除中
-            df['comment'][i] = my_delete(df['comment'][i])
-            df['contributor'][i] = my_delete(df['contributor'][i])
+            df['comment'][i] = self.my_delete(df['comment'][i])
+            df['contributor'][i] = self.my_delete(df['contributor'][i])
             #構文解析
             result = jumanpp.analysis(df['comment'][i])
-        
+            #print(result)
             #分析結果からdf作成
             for token in result.mrph_list():
                 tmp_word = token.midasi
                 # h:m:s -> hms　に変更
-                tmp_time = strtime_to_inttime(df['time'][i])
+                tmp_time = self.strtime_to_inttime(df['time'][i])
 
             #時間ごとのコメント数計算
-                tmp = my_index(df_time_point['time'],tmp_time)
+                tmp = self.my_index(df_time_point['time'],tmp_time)
                 if False !=tmp :
                     df_time_point['point'][tmp]+=1
                 else :
                     df_time_point = df_time_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
 
         #名詞の出現数計算
-                if 0 != word_Classification(token.hinsi):
+                if 0 != self.word_Classification(token.hinsi):
                 #名詞なら
-                    if word_Classification(token.hinsi) == '名詞':    
-                        tmp = my_index(df_word_point['word'],tmp_word)
+                    if self.word_Classification(token.hinsi) == '名詞':    
+                        tmp = self.my_index(df_word_point['word'],tmp_word)
                         if False != tmp :
                             df_word_point['point'][tmp] += 1
                         else :
@@ -128,7 +137,7 @@ class data_glaph :
         return df_time_word,df_word_point,df_time_point
 
 #---------------記号削除用プログラム-------------------
-    def my_delete(string) :
+    def my_delete(self, string) :
         if '\n' in string:
             string = string.replace('\n', ' ')
         if '@' in string:
@@ -137,21 +146,21 @@ class data_glaph :
         return string
 
 #----------------- h:m:s -> hms　に変更----------------
-    def strtime_to_inttime(time):
+    def strtime_to_inttime(self, time):
         string = time.replace(':', '')
         return int(string)
 
 #----------------品詞検索用---------------------------
-    def  word_Classification(tmp):
+    def  word_Classification(self, tmp):
         if tmp == '名詞':
             return'名詞'
         else :return 0
 
-"""--------------------------------------------------------------------------------------------------------------------------------------"""
-"""------------------------いろんなdf作成------------------------------------------------------"""
+#--------------------------------------------------------------------------------------------------------------------------------------
+#------------------------いろんなdf作成------------------------------------------------------
 
 #-----------------人とその人のコメント数のdf作成---------------
-    def make_df_human_point(df):
+    def make_df_human_point(self, df):
         df_human_point = pd.DataFrame(index=[], columns=['contributor','point'])#時間とその時のコメント数のｄｆ
         valu = df['contributor'].value_counts()
         name =  df['contributor'].unique()
@@ -164,7 +173,7 @@ class data_glaph :
 
 #========================データ作成(折れ線グラフ)=================================
 #------------------各時間の単語ごとの出現数のdf作成---------------------------
-    def time_word_point(df_time_word,df_word_point,df_time_point) :
+    def time_word_point(self, df_time_word,df_word_point,df_time_point) :
         df_time_word_point_stack = pd.DataFrame(index=[])
         df_time_word_point_line = pd.DataFrame(index=[])
         df_time_word_point_stack['time'] = df_time_point['time']
@@ -186,7 +195,7 @@ class data_glaph :
         return df_time_word_point_stack,df_time_word_point_line
 
 #---------------各時間の人ごとの出現数のdf作成-----------------------------------
-    def time_human_point(df,df_time_point,df_human_point) :
+    def time_human_point(self, df,df_time_point,df_human_point) :
         df_time_human_point_stack = pd.DataFrame(index=[])
         df_time_human_point_line = pd.DataFrame(index=[])
         df_time_human_point_stack['time'] = df_time_point['time']
@@ -207,18 +216,18 @@ class data_glaph :
 
         return df_time_human_point_stack,df_time_human_point_line
 #====================================================================================================
-"""--------------------------------------------------------------------------------------------------------------------------------------"""
-"""-----------------------------自作関数(便利用)-------------------------------------------------"""
+#--------------------------------------------------------------------------------------------------------------------------------------
+#-----------------------------自作関数(便利用)-------------------------------------------------
 
 #-----------------配列の中に一個でもtureがあればその番号を返す---------------------------
-    def my_Ture(row):
+    def my_Ture(self, row):
         for i in range(len(row)) :
             if row[i] :
                 return i
         return False
 
 #----------------dfの中にxがあればその配列番号をなければFalseを返す-------------------
-    def my_index(l, x, default=False):
+    def my_index(self, l, x, default=False):
         l = l.values.tolist()
         if x in l:
             return l.index(x)
@@ -226,25 +235,25 @@ class data_glaph :
             return default
 
 #--------------------pointでソート--------------------------------------------------
-    def rank_sort(df,flag):
+    def rank_sort(self, df,flag):
         return df.sort_values('point',ascending=flag)
 
 #-----------------上位いくつかの単語だけ抽出--------------------------------------
-    def make_rank_word (ranknum,df__point,word):
+    def make_rank_word (self, ranknum,df__point,word):
         if ranknum > len(df__point):
             ranknum = len(df__point)
         elif ranknum < 0:
             ranknum = 0
     
-        df__point = rank_sort(df__point,False)
+        df__point = self.rank_sort(df__point,False)
         return df__point[word][0:ranknum]
-"""--------------------------------------------------------------------------------------------------------------------------------------"""
+#--------------------------------------------------------------------------------------------------------------------------------------
 
-"""-----------------------------------------------------------棒グラフ---------------------------------------------------------"""
+#-----------------------------------------------------------棒グラフ---------------------------------------------------------
 
 #---------------------棒グラフ出力用--------------------------
-    def print_bar_graph_df(df,calamu):
-        df = rank_sort(df,True)
+    def print_bar_graph_df(self, df,calamu):
+        df = self.rank_sort(df,True)
         plt.tight_layout()
         plt.rcParams["font.size"] = 25
         plt.figure(figsize=(10,20 ), dpi=50,facecolor='#FFFFFF')
@@ -252,11 +261,11 @@ class data_glaph :
         plt.grid(which='major',color='black',linestyle='-',axis = "x")
         plt.show()
 
-"""--------------------------------------------------------------------------------------------------------------------------------------"""
-"""--------------------------------------感情推定----------------------------------------"""
+#--------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------感情推定----------------------------------------
 
 #----------各時間でのネガティブかポジティブかをdfに-------------------------
-    def make_df_time_negapozi(df_time_word,df_time_point,df_kanzyou):
+    def make_df_time_negapozi(self, df_time_word,df_time_point,df_kanzyou):
         df_time_negapozi = pd.DataFrame(index=[])
         df_time_negapozi['time'] = df_time_point['time']
         df_time_negapozi['negapozi'] = 0
@@ -264,7 +273,7 @@ class data_glaph :
         for i in range(len(df_time_negapozi)):
         
             while df_time_negapozi['time'][i] == df_time_word['time'][c]:
-                tmp = my_index(df_kanzyou['word'],df_time_word['word'][c])
+                tmp = self.my_index(df_kanzyou['word'],df_time_word['word'][c])
                 if tmp == False:
                     df_time_negapozi['negapozi'][i:] += 0
                 else:
@@ -277,71 +286,71 @@ class data_glaph :
                      return df_time_negapozi
     
         return df_time_negapozi
-"""--------------------------------------------------------------------------------------------------------------------------------------"""
-"""-------------------------------------------get関数-------------------------------------------------"""
+#--------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------------get関数-------------------------------------------------
 
-def get_word_num(df_word_point):
-    return len(df_word_point)
+    def get_word_num(self, df_word_point):
+        return len(df_word_point)
 
-def get_word_num(df_word_point):
-    return df_word_point['word']
+    def get_word_num(self, df_word_point):
+        return df_word_point['word']
 
-def get_word_num(df_human_point):
-    return df_human_point['human']
-"""--------------------------------------------------------------------------------------------------------------------------------------"""
-"""-------------------------------------main-------------------------------------------------------------------"""
+    def get_word_num(self, df_human_point):
+        return df_human_point['human']
+#--------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------main-------------------------------------------------------------------
 
-#表示用
+    #表示用
     #csvデータから、出力まで
-    def main_graph(data) :
+    def main_graph(self, data) :
     #------------データ作成----------------
-    #感情推定用df
-    df_kanzyou = csv_df('kanzyou.csv')
-    #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
-    
-    #csvファイルをデータフレームに変換
-    df = csv_df(data)
-    #コメントデータからデータ抽出＆データフレーム作成
-    df_time_word,df_word_point,df_time_point = string_word_point(df)
-    #人とその人のコメント数のdf作成
-    df_human_point = make_df_human_point(df)
+        #感情推定用df
+        df_kanzyou = csv_df('kanzyou.csv')
+        #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
+        
+        #csvファイルをデータフレームに変換
+        df = csv_df(data)
+        #コメントデータからデータ抽出＆データフレーム作成
+        df_time_word,df_word_point,df_time_point = string_word_point(df)
+        #人とその人のコメント数のdf作成
+        df_human_point = make_df_human_point(df)
 
-    #各時間でのネガティブかポジティブかをdfに
-    df_time_negapozi = make_df_time_negapozi(df_time_word,df_time_point,df_kanzyou)
-    #各時間の単語ごとの出現数のdf作成
-    df_time_word_point_stack,df_time_word_point_line = time_word_point(df_time_word,df_word_point,df_time_point)
-    #各時間の人ごとの出現数のdf作成
-    df_time_human_point_stack,df_time_human_point_line = time_human_point(df,df_time_point,df_human_point)
+        #各時間でのネガティブかポジティブかをdfに
+        df_time_negapozi = make_df_time_negapozi(df_time_word,df_time_point,df_kanzyou)
+        #各時間の単語ごとの出現数のdf作成
+        df_time_word_point_stack,df_time_word_point_line = time_word_point(df_time_word,df_word_point,df_time_point)
+        #各時間の人ごとの出現数のdf作成
+        df_time_human_point_stack,df_time_human_point_line = time_human_point(df,df_time_point,df_human_point)
     #------------------保存変数-----------------------------------
-    rank_human = make_rank_word(2,df_human_point,'contributor')
-    rank_word  = make_rank_word(5,df_word_point,'word')
+        rank_human = make_rank_word(2,df_human_point,'contributor')
+        rank_word  = make_rank_word(5,df_word_point,'word')
 
 
 
     #--------------表示-----------------------
-    ##折れ線グラフ描画
-    print_line_graph(df_time_word_point_line,rank_word,100)
-    print_line_graph( df_time_human_point_line,rank_human,5)
-    print_line_graph(df_time_negapozi,'negapozi',5)
+        ##折れ線グラフ描画
+        print_line_graph(df_time_word_point_line,rank_word,100)
+        print_line_graph( df_time_human_point_line,rank_human,5)
+        print_line_graph(df_time_negapozi,'negapozi',5)
 
-    #棒グラフ出力用
-    print_bar_graph_df(df_word_point,'word')
-    print_bar_graph_df(df_human_point,'contributor')
-    
-    #treemap出力用　
-    print_treemap(df_word_point,'treemap')
+        #棒グラフ出力用
+        print_bar_graph_df(df_word_point,'word')
+        print_bar_graph_df(df_human_point,'contributor')
+        
+        #treemap出力用　
+        print_treemap(df_word_point,'treemap')
 
-"""--------------------------------------------------------------------------------------------------------------------------------------"""
+#--------------------------------------------------------------------------------------------------------------------------------------
 
-"""-----------------------------------------------------------折れ線グラフ---------------------------------------------------------"""
+#-----------------------------------------------------------折れ線グラフ---------------------------------------------------------
 
 #----------------------折れ線グラフ描画----------------------------------------------
-    def print_line_graph(df,word,cutnum):
+    def print_line_graph(self, df,word,cutnum):
         df = df_time__(df,cutnum)
-    
+
         left = df[df.columns[0]]
         data =[]
-    
+
         ax = plt.figure(figsize=(30,10), dpi=50,facecolor='#FFFFFF')    
         plt.legend(loc="upper left", fontsize=18)
 
@@ -358,7 +367,7 @@ def get_word_num(df_human_point):
 #----------------区切る時間を指定して，グラフ用df作成---------------------------
 #h:m:s
 #cuttime = (int) hms
-    def df_time__(df,cuttime):
+    def df_time__(self, df,cuttime):
         start = df['time'][0]
         tmp = []
         for i in range(len(df.columns)-1):
@@ -395,3 +404,42 @@ def get_word_num(df_human_point):
         df_result = pd.concat([df_result, df_2])
 
         return df_result
+
+    def main_graph_test(self, df, fig, ax) :
+    #------------データ作成----------------
+        #感情推定用df
+        df_kanzyou = self.csv_df('kanzyou.csv')
+        #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
+        
+        #csvファイルをデータフレームに変換
+        #df = csv_df(data)
+        #コメントデータからデータ抽出＆データフレーム作成
+        df_time_word,df_word_point,df_time_point = self.string_word_point(df)
+        #人とその人のコメント数のdf作成
+        df_human_point = self.make_df_human_point(df)
+
+        #各時間でのネガティブかポジティブかをdfに
+        df_time_negapozi = self.make_df_time_negapozi(df_time_word,df_time_point,df_kanzyou)
+        #各時間の単語ごとの出現数のdf作成
+        df_time_word_point_stack,df_time_word_point_line = self.time_word_point(df_time_word,df_word_point,df_time_point)
+        #各時間の人ごとの出現数のdf作成
+        df_time_human_point_stack,df_time_human_point_line = self.time_human_point(df,df_time_point,df_human_point)
+    #------------------保存変数-----------------------------------
+        rank_human = self.make_rank_word(2,df_human_point,'contributor')
+        rank_word  = self.make_rank_word(5,df_word_point,'word')
+
+
+
+    #--------------表示-----------------------
+        ##折れ線グラフ描画
+        #print_line_graph(df_time_word_point_line,rank_word,100)
+        #print_line_graph( df_time_human_point_line,rank_human,5)
+        #print_line_graph(df_time_negapozi,'negapozi',5)
+
+        #棒グラフ出力用
+        #print_bar_graph_df(df_word_point,'word')
+        #print_bar_graph_df(df_human_point,'contributor')
+        #treemap出力用　
+        #return self.print_treemap(df_word_point,'treemap', fig, ax)
+        self.print_treemap(df_word_point,'treemap', fig, ax)
+#--------------------------------------------
