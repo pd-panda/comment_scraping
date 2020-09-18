@@ -40,6 +40,8 @@ class DataGraph:
     def print_treemap(self, df, title, fig, ax) :
         #ソート
         df = self.rank_sort(df,False)
+        #最大文字数検索
+        max_num = self.max_word_num(df) 
 
         sns.set()
         matplotlib.rcParams['figure.figsize'] = (16.0, 9.0)
@@ -62,7 +64,7 @@ class DataGraph:
         colors = [cmap(norm(value)) for value in df["Population"]]
 
         # Plotting
-        squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors, text_kwargs={'fontsize':24,'color':'black'})
+        squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors, text_kwargs={'fontsize':int(100/max_num),'color':'black'})
         # 軸削除
         plt.axis('off')
         # y軸逆に
@@ -98,6 +100,7 @@ class DataGraph:
         df_time_word = pd.DataFrame(index=[], columns=['time','word']) #単語と時間のｄｆ
         df_word_point = pd.DataFrame(index=[], columns=['word','point'])#単語とその出現数のｄｆ
         df_time_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のコメント数のｄｆ
+        df_time_www_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のwww数のｄｆ
         #print(df_word_point)
         for i in range(len(df)):
             #print("記号削除前")
@@ -113,6 +116,7 @@ class DataGraph:
                 tmp_word = token.midasi
                 # h:m:s -> hms　に変更
                 tmp_time = self.strtime_to_inttime(df['time'][i])
+                
 
             #時間ごとのコメント数計算
                 tmp = self.my_index(df_time_point['time'],tmp_time)
@@ -120,6 +124,16 @@ class DataGraph:
                     df_time_point['point'][tmp]+=1
                 else :
                     df_time_point = df_time_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
+                
+                if False != self.www_hanbetu(tmp_word):
+                    tmp = self.my_index(df_time_www_point['time'],tmp_time)
+                    if False !=tmp :
+                        df_time_www_point['point'][tmp]+=1
+                    else :
+                        df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
+                else:
+                    df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
+
 
         #名詞の出現数計算
                 if 0 != self.word_Classification(token.hinsi):
@@ -134,7 +148,7 @@ class DataGraph:
                     #名詞とその時の時間
                         df_time_word = df_time_word.append({'time':tmp_time,'word': tmp_word}, ignore_index=True)
 
-        return df_time_word,df_word_point,df_time_point
+        return df_time_word,df_word_point,df_time_point,df_time_www_point
 
 #---------------記号削除用プログラム-------------------
     def my_delete(self, string) :
@@ -155,6 +169,16 @@ class DataGraph:
         if tmp == '名詞':
             return'名詞'
         else :return 0
+
+#----------------www,（笑），草---------------------------
+    def www_hanbetu(word):
+        if 'ww' in word:
+            return True
+        elif '笑' == word:
+            return True
+        elif '草' == word:
+            return True
+        else:return False 
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 #------------------------いろんなdf作成------------------------------------------------------
@@ -247,6 +271,15 @@ class DataGraph:
     
         df__point = self.rank_sort(df__point,False)
         return df__point[word][0:ranknum]
+    
+#-----------------最大文字数--------------------------------------
+    def max_word_num(self,df):
+        max = 0
+        for word in df['word']:
+            if max < len(word) :
+                max = len(word)
+
+        return max
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------棒グラフ---------------------------------------------------------
@@ -345,8 +378,8 @@ class DataGraph:
 #-----------------------------------------------------------折れ線グラフ---------------------------------------------------------
 
 #----------------------折れ線グラフ描画----------------------------------------------
-    def print_line_graph(self, df,word,cutnum):
-        df = df_time__(df,cutnum)
+    def print_line_graph(self, df,word,cutnum,flag = 'line'):
+        df = self.df_time__(df,cutnum,flag)
 
         left = df[df.columns[0]]
         data =[]
@@ -367,7 +400,7 @@ class DataGraph:
 #----------------区切る時間を指定して，グラフ用df作成---------------------------
 #h:m:s
 #cuttime = (int) hms
-    def df_time__(self, df,cuttime):
+    def df_time__(self, df,cuttime,flag = 'line'):
         start = df['time'][0]
         tmp = []
         for i in range(len(df.columns)-1):
@@ -388,9 +421,13 @@ class DataGraph:
                 tmp.insert(0, time)
                 df_2 = pd.DataFrame([tmp],columns=df_result.columns)
                 df_result = pd.concat([df_result, df_2])
-                tmp = []
-                for i in range(len(df.columns)-1):
-                    tmp = tmp + [0]
+                tmp = tmp[1:]
+                
+                if flag == 'line' :
+                    tmp = []
+                    for i in range(len(df.columns)-1):
+                        tmp = tmp + [0]
+                        
                 start += cuttime
                 if start % 100 >= 60:
                     start = start - 60 + 100
@@ -432,13 +469,14 @@ class DataGraph:
 
     #--------------表示-----------------------
         ##折れ線グラフ描画
-        #print_line_graph(df_time_word_point_line,rank_word,100)
-        #print_line_graph( df_time_human_point_line,rank_human,5)
-        #print_line_graph(df_time_negapozi,'negapozi',5)
+        #self.print_line_graph(df_time_word_point_line,rank_word,100)
+        #self.print_line_graph( df_time_human_point_line,rank_human,5)
+        #self.print_line_graph( df_time_human_point_stack,rank_human,5,'stack')
+        #self.print_line_graph(df_time_negapozi,'negapozi',5)
 
         #棒グラフ出力用
-        #print_bar_graph_df(df_word_point,'word')
-        #print_bar_graph_df(df_human_point,'contributor')
+        #self.print_bar_graph_df(df_word_point,'word')
+        #self.print_bar_graph_df(df_human_point,'contributor')
         #treemap出力用　
         #return self.print_treemap(df_word_point,'treemap', fig, ax)
         self.print_treemap(df_word_point,'treemap', fig, ax)
