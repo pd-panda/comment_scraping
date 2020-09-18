@@ -1,0 +1,108 @@
+<SetSCN>:
+    name: 'set'
+    begin_path_dsp: begin_path_dsp
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            BoxLayout:
+                Label:
+                    size_hint_x: 0.1
+                    text: '開始パス'
+                TextInput:
+                    id: begin_path_dsp
+                    size_hint_x: 0.8
+                Button:
+                    size_hint_x: 0.1
+                    text: '…'
+                    on_release: root.setSelect()
+        BoxLayout:
+            size_hint_y: 0.8
+        BoxLayout:
+            size_hint_y: 0.1
+            Button:
+                size_hint_x: 0.5
+                text: 'OK'
+                on_release: root.selfOk()
+            Button:
+                size_hint_x: 0.5
+                text: 'キャンセル'
+                on_release: root.selfCancel()
+<AllSCN>:
+    name: 'all'
+    tv: tv
+    file_name: file_name
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout: #OpnSCN
+            size_hint_y: 0.1
+            orientation: 'horizontal'
+            BoxLayout:
+                Button:
+                    size_hint_x: 0.1
+                    text: '設定'
+                    on_release: root.setupButtonClicked()
+                TextInput:
+                    id: file_name
+                    size_hint_x: 0.7
+                    text: 'ファイルパス'
+                Button:
+                    size_hint_x: 0.1
+                    text: '…'
+                    on_release: root.show_load()
+                Button:
+                    size_hint_x: 0.1
+                    text: '実行'
+        BoxLayout: #ResultSCN
+            size_hint_y: 0.9
+            TreeView:
+                id: tv
+<MsgboxOk>
+    orientation: 'vertical'
+    Label:
+        size_hint_y: 0.9
+        text: root.message_text
+    BoxLayout:
+        size_hint_y: 0.1
+        orientation: 'horizontal'
+        Button:
+            size_hint_x: 10
+            text: 'OK'
+            on_release: root.ok_button()
+<MsgboxOkCancel>
+    orientation: 'vertical'
+    Label:
+        size_hint_y: 0.9
+        text: root.message_text
+    BoxLayout:
+        size_hint_y: 0.1
+        orientation: 'horizontal'
+        Button:
+            size_hint_x: 10
+            text: 'OK'
+            on_release: root.ok_button()
+        Button:
+            size_hint_x: 10
+            text: 'キャンセル'
+            on_release: root.cancel_button()
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: 'vertical'
+        FileChooserListView:
+            id: filechooser
+            path: root.current_dir
+            filters: [root.is_dir]
+
+        BoxLayout:
+            size_hint_y : None
+            height : 30
+            Button:
+                text: 'キャンセル'
+                on_release: root.cancel()
+            Button:
+                text: '読み込み'
+                on_release: root.load(filechooser.path, filechooser.selection)
+AllSCN:
