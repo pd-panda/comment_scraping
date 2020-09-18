@@ -64,7 +64,8 @@ class DataGraph:
         colors = [cmap(norm(value)) for value in df["Population"]]
 
         # Plotting
-        squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors, text_kwargs={'fontsize':int(100/max_num),'color':'black'})
+        #squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors, text_kwargs={'fontsize':int(100/max_num),'color':'black'})
+        squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors)
         # 軸削除
         plt.axis('off')
         # y軸逆に
