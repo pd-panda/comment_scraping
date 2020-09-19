@@ -94,8 +94,9 @@ class GraphView(BoxLayout):
         # テキストファイル読み込み
         global loadfilepath
         global df
-
+        # テキストファイルからdfの生成
         df = getcomment.main(loadfilepath, savefilepath)
+        print(df)
         self.update_view(df)
 
     def update_view(self, df):

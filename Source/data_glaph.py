@@ -73,9 +73,6 @@ class DataGraph:
         ttl.set_position([.5, 1.05])
         # 背景色
         fig.set_facecolor('#eeffee')
-        #plt.show()
-        #fig, ax = plt.subplots()
-        #ax.plot(x, y, label="test")
 
 #-------------------割合作成後dfに追加----------------------
     def add_percent(self, df) :
@@ -151,7 +148,7 @@ class DataGraph:
         return int(string)
 
 #----------------品詞検索用---------------------------
-    def  word_Classification(self, tmp):
+    def word_Classification(self, tmp):
         if tmp == '名詞':
             return'名詞'
         else :return 0
@@ -203,6 +200,8 @@ class DataGraph:
 
         human = df_human_point['contributor']
 
+        #print(df_time_human_point_stack['time'])
+
         for row in human:
             df_time_human_point_stack[row] = 0
             df_time_human_point_line[row] = 0
@@ -210,6 +209,7 @@ class DataGraph:
             tmp_list = [i for i, x in enumerate(df['contributor'] == row) if x == True]
         
             for i in tmp_list:
+                print(i)
                 tmp = df_time_human_point_stack['time'].values.tolist().index(df_time_point['time'][i])
                 df_time_human_point_stack[row][tmp:] +=1
                 df_time_human_point_line[row][tmp] +=1
@@ -443,3 +443,29 @@ class DataGraph:
         #return self.print_treemap(df_word_point,'treemap', fig, ax)
         self.print_treemap(df_word_point,'treemap', fig, ax)
 #--------------------------------------------
+
+    def init_graph(self, df, fig, ax) :
+    #------------データ作成----------------
+        #感情推定用df
+        self.df_kanzyou = self.csv_df('kanzyou.csv')
+        #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
+        
+        #csvファイルをデータフレームに変換
+        #df = csv_df(data)
+        #コメントデータからデータ抽出＆データフレーム作成
+        self.df_time_word,df_word_point,df_time_point = self.string_word_point(df)
+        #人とその人のコメント数のdf作成
+        self.df_human_point = self.make_df_human_point(df)
+
+        #各時間でのネガティブかポジティブかをdfに
+        self.df_time_negapozi = self.make_df_time_negapozi(df_time_word,df_time_point,df_kanzyou)
+        #各時間の単語ごとの出現数のdf作成
+        self.df_time_word_point_stack,df_time_word_point_line = self.time_word_point(df_time_word,df_word_point,df_time_point)
+        #各時間の人ごとの出現数のdf作成
+        self.df_time_human_point_stack,df_time_human_point_line = self.time_human_point(df,df_time_point,df_human_point)
+    #------------------保存変数-----------------------------------
+        self.rank_human = self.make_rank_word(2,df_human_point,'contributor')
+        self.rank_word  = self.make_rank_word(5,df_word_point,'word')
+    #--------------表示-----------------------
+        #デフォルトのグラフ表示
+        self.print_treemap(df_word_point,'treemap', fig, ax)
