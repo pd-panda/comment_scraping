@@ -173,32 +173,129 @@
             GraphView:
                 id: graph_view
                 size_hint_y: 0.5
-
-            Label:
-                text: root.text
-                color: root.color
-                size_hint_y: 0.2
-                font_size: 68
             BoxLayout:
                 orientation: 'horizontal'
-                size_hint_y: 0.3
-                padding: 20,30,20, 10
-                Button:
-                    id: button1
-                    text: "いい感じ"
-                    font_size: 68
-                    on_press: root.buttonClicked1()  # ボタンをクリックした時にpython側の関数を呼ぶ
-                Button:
-                    id: button2
-                    text: "フツー"
-                    font_size: 68
-                    #on_press: root.buttonClicked2()
-                    #on_press: root.ids.graph_view.update_view()
-                    on_press: root.ids.graph_view.test_sin_show()
-                Button:
-                    id: button3
-                    text: "しあわせ〜"
-                    font_size: 68
-                    on_press: root.buttonClicked3()
+                size_hint_y: 0.5
+                padding: 20, 30, 20, 10
+                BoxLayout:
+                    orientation: 'vertical'
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: 0.15
+                        CheckBox:
+                            group: 'radio'
+                            size_hint_x: 0.3
+                            active: root.check
+                            on_press: root.checkbox_check(self)
+                        Label:
+                            text: "コメント数"
+                            color: [0.23,0.23,0.23,1]
+                            size_hint_x: 0.7
+                            font_size: 24
+                            halign: 'left'
+                            valign: 'middle'
+                            text_size: self.size
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: 0.15
+                        CheckBox:
+                            group: 'radio'
+                            size_hint_x: 0.3
+                            active: root.check
+                            on_press: root.checkbox_check(self)
+                        Label:
+                            text: "感情推移"
+                            color: [0.23,0.23,0.23,1]
+                            size_hint_x: 0.7
+                            font_size: 24
+                            halign: 'left'
+                            valign: 'middle'
+                            text_size: self.size
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: 0.15
+                        CheckBox:
+                            group: 'radio'
+                            size_hint_x: 0.3
+                            active: root.check
+                            on_press: root.checkbox_check(self)
+                        Label:
+                            text: "質問数"
+                            color: [0.23,0.23,0.23,1]
+                            size_hint_x: 0.7
+                            font_size: 24
+                            halign: 'left'
+                            valign: 'middle'
+                            text_size: self.size
+                    BoxLayout:
+                        size_hint_y: 0.55
+                BoxLayout:
+                    orientation: 'horizontal'
+                    canvas.before: 
+                        Rectangle: 
+                            pos: self.pos 
+                            size: self.size 
+                            source: './Source/image/commentpanel.png'
+                    BoxLayout:
+                        padding: 20, 30, 20, 10
+                        orientation: 'vertical'
+                        Label:
+                            text: "コメント数"
+                            color: [0.23,0.23,0.23,1]
+                            font_size: 32
+                            halign: 'center'
+                            valign: 'middle'
+                            size_hint_y: 0.1
+                        Image:
+                            size_hint_y: 0.05
+                            keep_ratio: True
+                            source: './Source/image/line.png'
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_y: 0.15
+                            CheckBox:
+                                size_hint_x: 0.3
+                                active: root.check1
+                                on_press: root.checkbox_check1(self)
+                            Label:
+                                text: "コメント数"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_y: 0.15
+                            CheckBox:
+                                size_hint_x: 0.3
+                                active: root.check2
+                                on_press: root.checkbox_check2(self)
+                            Label:
+                                text: "感情推移"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_y: 0.15
+                            CheckBox:
+                                size_hint_x: 0.3
+                                active: root.check3
+                                on_press: root.checkbox_check3(self)
+                            Label:
+                                text: "質問数"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            size_hint_y: 0.40
                     
 <GraphView>:
