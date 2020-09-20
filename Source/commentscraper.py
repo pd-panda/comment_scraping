@@ -9,6 +9,7 @@ from selenium.common.exceptions import TimeoutException
 import time
 import sys
 import pandas as pd
+import numpy as np
 
 class Scraper:
     # 取得したいテキストのclassタグ
@@ -17,8 +18,9 @@ class Scraper:
     timeclass = ".Bubble__InformationText-v4d1le-6.Bubble__Time-v4d1le-7.bsRdRB"
 
     # データフレームのカラム名
-    colname1 = "comment"
-    colname2 = "time"
+    colname1 = "time"
+    colname2 = "comment"
+    colname3 = "contributor"
 
     # スクレイピングするルーム名
     room_name = "カフカ読書会"
@@ -56,16 +58,19 @@ class Scraper:
 
 
     # htmlからデータフレームを取得
+    # time, comment, contributor
     def get_df_from_html(self, html):
         # BeautifulSoupで扱えるようにパースする
         soup = BeautifulSoup(html, "html.parser")
-        # テキストのリスト生成
-        words = self.elemlist_to_datalist(soup.select(self.textclass))
         # 時間のリスト生成
         times = self.elemlist_to_datalist(soup.select(self.timeclass))
+        # テキストのリスト生成
+        comments = self.elemlist_to_datalist(soup.select(self.textclass))
 
+        create_df = self.create_df_from_datalists(times, comments)
+        create_df[self.colname3] = np.nan
         # 作成したデータフレームを返す
-        return self.create_df_from_datalists(words, times)
+        return create_df
 
 
 
@@ -77,14 +82,14 @@ class Scraper:
 
     # 2つのデータリストからデータフレームを作成
     def create_df_from_datalists(self, datalist1, datalist2):
-        return pd.DataFrame({ self.colname1: datalist1, self.colname2: datalist2 })
+        return pd.DataFrame({ self.colname1: datalist1, self.colname2: datalist2})
 
 
     # データフレームを指定ファイル名のcsvファイルに出力
     def export_df_to_CSV(self, df, filename):
         df.to_csv(filename, encoding="utf_8_sig")
 
-    def main(self, room_name):
+    def main(self, room_name= "カフカ読書会"):
         # スクレイピングするurl
         url = "https://commentscreen.com/comments?room=" + room_name
 
@@ -92,12 +97,13 @@ class Scraper:
         html = self.get_html_from_url(url)
         # htmlからデータフレームを取得
         dataframe = self.get_df_from_html(html)
-
+        print("関数内DF表示")
         print(dataframe)
 
         # データフレームをcsvファイルに出力
         self.export_df_to_CSV(dataframe, self.exportcsvfile)
 
+        return dataframe
         
 
 '''
