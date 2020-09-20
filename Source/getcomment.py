@@ -44,14 +44,31 @@ class GetComment:
         timelist = []
         namelist = []
         textlist = []
-        for a in readtxtlist:
-            if len(a.split('\t')) == 1:
-                #textlist.append(a.split('\t')[0])
-                textlist[-1]+=a.split('\t')[0]
-            else:
-                timelist.append(a.split('\t')[0])
-                namelist.append(a.split('\t')[1])
-                textlist.append(a.split('\t')[2])
+
+        if '開始 ' in readtxtlist[0]:
+            #print("chat directsave ¥t")
+            #print(len(readtxtlist[0].split('\t')))
+            count = 0
+            for a in readtxtlist[:len(readtxtlist)-1:]:
+                if len(a.split('\t')) == 1:
+                    textlist[-1]+=a.split('\t')[0]
+                else:
+                    timelist.append(a.split('\t')[0])
+                    namelist.append(a.split('\t')[1].split(' : ')[0])
+                    textlist.append(a.split('\t')[1].split(' : ')[1])
+            
+            #print(count)
+        else:
+            for a in readtxtlist:
+                #print(a)
+                #print(len(a.split('\t')))
+                if len(a.split('\t')) == 1:
+                    #textlist.append(a.split('\t')[0])
+                    textlist[-1]+=a.split('\t')[0]
+                else:
+                    timelist.append(a.split('\t')[0])
+                    namelist.append(a.split('\t')[1])
+                    textlist.append(a.split('\t')[2])
             #if len(a.rsplit('\n',1)) == 1:
             #    timelist.append(a)
             #else:
@@ -120,8 +137,8 @@ class GetComment:
         datalist = self.get_datalist_from_textdata(textlist)
         df = self.get_df_from_datalist(datalist, columns)
         self.save_csv_from_df(df, savefilepath)
-        print("関数内df表示")
-        print(df)
+        #print("関数内df表示")
+        #print(df)
         return df
 
 

@@ -1,8 +1,8 @@
 # チャット可視化アプリ「コメント見える君」 
 
-<img width="174" alt="mierulogo" src="https://user-images.githubusercontent.com/20110372/92326828-ecad6e80-f08f-11ea-9afb-234a2af78d83.png">
+<img width="174" alt="mierulogo" src="https://user-images.githubusercontent.com/20110372/93692471-b0b5e700-fb2e-11ea-97be-13b8a033b98e.jpg"><BR>
 
-<img width="400px" alt="コメント見える君" src="https://user-images.githubusercontent.com/20110372/90475951-7ccc5800-e163-11ea-87c2-e70765a87ffe.png"><BR>
+<img width="400px" alt="コメント見える君" src="https://user-images.githubusercontent.com/20110372/93692489-f5418280-fb2e-11ea-831a-71d2c5b36df5.png"><BR>
 
 ## はじめに
 感染症拡大の影響で、オンラインイベントが増加しています。<BR>
