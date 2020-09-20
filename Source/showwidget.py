@@ -88,6 +88,13 @@ class GraphView(BoxLayout):
         #self.plt.imshow(img) # 画像の描画
         #self.get_center_yplt.show() # 描画結果の表示
 
+        self.ax.axis('off')
+
+        # 再描画する
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+
+
         # 再描画する
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
