@@ -44,7 +44,7 @@ class GetComment:
         timelist = []
         namelist = []
         textlist = []
-
+        print(readtxtlist[1])
         if '開始 ' in readtxtlist[0]:
             count = 0
             for a in readtxtlist[:len(readtxtlist)-1:]:

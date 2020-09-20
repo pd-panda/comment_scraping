@@ -35,6 +35,7 @@ class DataGraph:
 #-----------csvファイルをデータフレームに変換--------------
     def csv_df(self, fname):
         df = pd.read_csv(os.path.join(sourcedir, fname))
+        df = df.dropna(how='all').dropna(how='all', axis=1)
         return df
 #-----------------------------------------------------------treemap---------------------------------------------------------
 #------------------treemap出力用------------------------　
@@ -108,6 +109,7 @@ class DataGraph:
             #print("記号削除前")
             #print(df_word_point)
             #記号削除中
+            print(df['comment'][i])
             df['comment'][i] = self.my_delete(df['comment'][i])
             #df['contributor'][i] = self.my_delete(df['contributor'][i])
             
@@ -133,12 +135,12 @@ class DataGraph:
             #拍手があったら1追加なかったら0追加
             if False != self.hakusyu_hanbetu(df['comment'][i]):
                 if False !=tmp :
-                    df_time_88_point['point'][tmp]+=1
+                    df_time_hakusyu_point['point'][tmp]+=1
                 else :
-                    df_time_88_point = df_time_88_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
+                    df_time_hakusyu_point = df_time_hakusyu_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
             else:
                 if False == tmp :
-                    df_time_88_point = df_time_88_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
+                    df_time_hakusyu_point = df_time_hakusyu_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
 
                 #構文解析
                 result = jumanpp.analysis(df['comment'][i])
@@ -381,10 +383,10 @@ class DataGraph:
 #-----------------------------------------------------------散布図---------------------------------------------------------
 #----------------------------------wwwwww描画用-------------------------------------------
 #wwwの散布図表示用
-    def print_www(self,df,cutnum,flag='line'):
-        df = df_time__(df,cutnum,flag)
+    def print_www(self,df,cutnum, fig, ax, flag='line'):
+        df = self.df_time__(df,cutnum,flag)
         i = 0
-        ax = plt.figure(figsize=(30,10), dpi=50,facecolor='#FFFFFF')     
+        #ax = plt.figure(figsize=(30,10), dpi=50,facecolor='#FFFFFF')     
         for tmp in df['point']:
             y1 = np.random.rand(tmp)
             x1 = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
@@ -392,7 +394,7 @@ class DataGraph:
             i+=1
             plt.scatter(x1,y1, c=color,s=1800, marker="$w$",alpha=0.5)
 
-        plt.show()
+        #plt.show()
 #色決め
     def rand_green(self,rand):
         if rand <= 0.1:
@@ -418,19 +420,19 @@ class DataGraph:
         else : return '#339966'
 #-----------------------------------------------------------拍手表示用---------------------------------------------------------
 #拍手散布図表示用
-    def print_hausyu(self,df,cutnum,flag='line',zoom=1):
+    def print_hakusyu(self,df,cutnum, fig, ax,flag='line'):
         df = self.df_time__(df,cutnum,flag)
         i = 0
-        fig, ax = plt.subplots()     
+        #fig, ax = plt.subplots()     
         image_path ='1922466.png'
        
         for tmp in df['point']:
             y = np.random.rand(tmp)
             x = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
-            self.imscatter(x, y, image_path, ax=ax,  zoom=.25)    
+            self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) # path.join()
             ax.plot(x, y, 'ko',alpha=0)
         #plt.savefig('cactus_plot.png',dpi=200, transparent=False) 
-        plt.show()
+        #plt.show()
 
     def imscatter(self,x, y, image, ax=None, zoom=1): 
         if ax is None: 
@@ -587,7 +589,7 @@ class DataGraph:
         #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
 
         #コメントデータからデータ抽出＆データフレーム作成
-        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point = self.string_word_point(df)
+        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point = self.string_word_point(df)
         #人とその人のコメント数のdf作成
         if (scr_case == False):
             self.df_contributor_point = self.make_df_contributor_point(df)
@@ -626,3 +628,9 @@ class DataGraph:
 
         elif (graph_name == "df_time_negapozi_5"):
             self.print_line_graph(self.df_time_negapozi,'negapozi',5, fig, ax)
+
+        elif (graph_name == "df_time_www_point_100"):
+            self.print_www( self.df_time_www_point,100, fig, ax)
+
+        elif (graph_name == "df_time_hakusyu_point_100"):
+            self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)

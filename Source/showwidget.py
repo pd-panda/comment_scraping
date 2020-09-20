@@ -106,8 +106,14 @@ class GraphView(BoxLayout):
         global loadfilepath
         global df
         # テキストファイルからdfの生成
-        df = getcomment.main(loadfilepath, savefilepath)
+        if (os.path.splitext(loadfilepath) == '.txt'):
+            df = getcomment.main(loadfilepath, savefilepath)
+        elif (os.path.splitext(loadfilepath) == '.csv'):
+            df = dataglp.csv_df(loadfilepath)
+        else : # error処理
+            return
         print(df)
+        dataglp.init_graph(df)
         self.update_view(df, "func1")
     
     def load_scrapingdata(self):
@@ -117,6 +123,7 @@ class GraphView(BoxLayout):
         # スレッド処理で返り値を受け取るようにしたい・・・
         #t1 = threading.Thread(target=scr.main, args=["カフカ読書会"])
         #t1.start()
+        dataglp.init_graph(df)
         print("scraper end!!!")
         print(df)
         self.update_view(df, "func1")
@@ -125,7 +132,7 @@ class GraphView(BoxLayout):
         # 以前の内容を消去する
         self.ax.clear()
 
-        dataglp.init_graph(df)
+        #dataglp.init_graph(df)
         self.plot_graph(funcname)
 
         # 再描画する
@@ -150,6 +157,12 @@ class GraphView(BoxLayout):
         elif funcname == "func3":
             print("func3 play")
             dataglp.switch_graph(self.fig, self.ax, "bargraph_contributor")
+        elif funcname == "func4":
+            print("func4 play")
+            dataglp.switch_graph(self.fig, self.ax,"df_time_www_point_100")
+        elif funcname == "func5":
+            print("func5 play")
+            dataglp.switch_graph(self.fig, self.ax, "df_time_hakusyu_point_100")
 
 
 #glp = GraphView()
