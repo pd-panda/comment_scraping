@@ -55,8 +55,10 @@ savefilepath = os.path.join(savefiledir, savefilename)
 loadfilepath = ""
 
 df = pd.DataFrame()
+#check = BooleanProperty(True)
 class GraphView(BoxLayout):
     """Matplotlib のグラフを表示するためのウィジェット"""
+    check = BooleanProperty(True)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #self.state = True
@@ -72,9 +74,6 @@ class GraphView(BoxLayout):
     def init_view(self):
         # 以前の内容を消去する
         self.ax.clear()
-        # 初期化に用いるデータ
-        x = np.linspace(-np.pi, np.pi, 100)
-        y = np.sin(x)
         #self.state = True
         #画像の読み込み
         #im = Image.open(os.path.join(imagedir, "QRcode.png"))
@@ -100,34 +99,37 @@ class GraphView(BoxLayout):
         # テキストファイルからdfの生成
         df = getcomment.main(loadfilepath, savefilepath)
         print(df)
-        self.update_view(df)
+        self.update_view(df, "func1")
 
-    def update_view(self, df):
+    def update_view(self, df, funcname):
         # 以前の内容を消去する
         self.ax.clear()
-        global loadfilepath
-        print("update_view")
-        print(loadfilepath)
 
-        df = getcomment.main(loadfilepath, savefilepath)
-        print("buttonclickedfunc")
-        print(df)
-        #self.ax.plot(x, y, label="test")
-
-        #dataglp.main_graph_test(df, self.fig, self.ax)
         dataglp.init_graph(df)
-        #dataglp.switch_graph(self.fig, self.ax, "df_time_word_point_line_100")
-        dataglp.switch_graph(self.fig, self.ax, "treemap")
-
-        # グラフの見栄えを調整する
-        #self.ax.relim()
-        #self.ax.autoscale_view()
-        #self.ax.plot(x, y, label="test")
-        #self.ax.set_title("test", color='red')
+        self.plot_graph(funcname)
 
         # 再描画する
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
+    
+    def checkbox_check(self, checkbox, funcname):
+        global df
+        print(funcname)
+        self.update_view(df,funcname)
+        self.check = checkbox.active
+        return
+    
+    def plot_graph(self, funcname):
+        print(funcname)
+        if funcname == "func1":
+            print("func1 play")
+            dataglp.switch_graph(self.fig, self.ax, "df_time_word_point_line_100")
+        elif funcname == "func2":
+            print("func2 play")
+            dataglp.switch_graph(self.fig, self.ax, "treemap")
+        elif funcname == "func3":
+            print("func3 play")
+            dataglp.switch_graph(self.fig, self.ax, "bargraph_contributor")
 
 
 #glp = GraphView()
@@ -139,7 +141,6 @@ class ShowWidget(Widget):
     color = ListProperty([1,1,1,1])
     fileinputimage = StringProperty(imagedir + 'nomalimage.png')
     filepath = StringProperty()
-    check = BooleanProperty(False)
     check1 = BooleanProperty(False)
     check2 = BooleanProperty(False)
     check3 = BooleanProperty(False)
@@ -164,7 +165,7 @@ class ShowWidget(Widget):
         self.text = 'I am soso!'
         print("pressed")
         self.color = [1, 1, 0 , 1]
-        glp.test_sin_show()
+        #glp.test_sin_show()
     
     def buttonClicked3(self):        # ボタンをクリック時
         self.text = 'I am happy!'
@@ -182,10 +183,6 @@ class ShowWidget(Widget):
         self.source = imagedir + 'righton.png'
         self.color = [0, 1, 1 , 1]
         print("buttonClickedfile!!!")
-    
-    def checkbox_check(self, checkbox):
-        self.check = checkbox.active
-        return
 
     def checkbox_check1(self, checkbox):
         self.check1 = checkbox.active

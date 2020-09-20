@@ -186,8 +186,8 @@
                         CheckBox:
                             group: 'radio'
                             size_hint_x: 0.3
-                            active: root.check
-                            on_press: root.checkbox_check(self)
+                            active: root.ids.graph_view.check
+                            on_press: root.ids.graph_view.checkbox_check(self, "func1")
                         Label:
                             text: "コメント数"
                             color: [0.23,0.23,0.23,1]
@@ -202,10 +202,10 @@
                         CheckBox:
                             group: 'radio'
                             size_hint_x: 0.3
-                            active: root.check
-                            on_press: root.checkbox_check(self)
+                            active: root.ids.graph_view.check
+                            on_press: root.ids.graph_view.checkbox_check(self, "func2")
                         Label:
-                            text: "感情推移"
+                            text: "TreeMap"
                             color: [0.23,0.23,0.23,1]
                             size_hint_x: 0.7
                             font_size: 24
@@ -218,10 +218,10 @@
                         CheckBox:
                             group: 'radio'
                             size_hint_x: 0.3
-                            active: root.check
-                            on_press: root.checkbox_check(self)
+                            active: root.ids.graph_view.check
+                            on_press: root.ids.graph_view.checkbox_check(self, "func3")
                         Label:
-                            text: "質問数"
+                            text: "投稿者数"
                             color: [0.23,0.23,0.23,1]
                             size_hint_x: 0.7
                             font_size: 24
@@ -253,7 +253,7 @@
                             source: './Source/image/line.png'
                         BoxLayout:
                             orientation: 'horizontal'
-                            size_hint_y: 0.15
+                            size_hint_y: 0.2
                             CheckBox:
                                 size_hint_x: 0.3
                                 active: root.check1
@@ -268,7 +268,7 @@
                                 text_size: self.size
                         BoxLayout:
                             orientation: 'horizontal'
-                            size_hint_y: 0.15
+                            size_hint_y: 0.2
                             CheckBox:
                                 size_hint_x: 0.3
                                 active: root.check2
@@ -283,7 +283,7 @@
                                 text_size: self.size
                         BoxLayout:
                             orientation: 'horizontal'
-                            size_hint_y: 0.15
+                            size_hint_y: 0.2
                             CheckBox:
                                 size_hint_x: 0.3
                                 active: root.check3
@@ -297,6 +297,6 @@
                                 valign: 'middle'
                                 text_size: self.size
                         BoxLayout:
-                            size_hint_y: 0.40
+                            size_hint_y: 0.4
                     
 <GraphView>:
