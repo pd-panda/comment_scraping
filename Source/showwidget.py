@@ -213,7 +213,7 @@ class ShowWidget(Widget):
     def _on_file_drop(self, window, file_path):
         global loadfilepath
         loadfilepath = file_path.decode()
-        self.filepath = file_path.decode()
+        self.filepath = os.path.basename(file_path.decode())
         self.fileinputimage = imagedir + 'inputimage.png'
 
 class CommentShowApp(App):
