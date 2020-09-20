@@ -27,6 +27,7 @@ from pyknp import Juman#
 #京都大学大学院情報学研究科知能情報学専攻黒橋・褚・村脇研究室 (http://nlp.ist.i.kyoto-u.ac.jp/)
 import warnings
 warnings.filterwarnings('ignore')
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 sourcedir = "./Source"
 
 class DataGraph:
@@ -99,6 +100,8 @@ class DataGraph:
         df_word_point = pd.DataFrame(index=[], columns=['word','point'])#単語とその出現数のｄｆ
         df_time_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のコメント数のｄｆ
         df_time_www_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のwww数のｄｆ
+        df_time_hakusyu_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時の拍手数のｄｆ
+
         #print(df_word_point)
         for i in range(len(df)):
             #print("記号削除前")
@@ -106,34 +109,41 @@ class DataGraph:
             #記号削除中
             df['comment'][i] = self.my_delete(df['comment'][i])
             df['contributor'][i] = self.my_delete(df['contributor'][i])
+            # h:m:s -> hms　に変更
+            tmp_time = self.strtime_to_inttime(df['time'][i])
+            
+            
+            #時間ごとのコメント数計算
+            tmp = self.my_index(df_time_point['time'],tmp_time)
+            if False !=tmp :
+                df_time_point['point'][tmp]+=1
+            else :
+                df_time_point = df_time_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
+            #wwwがあったら1追加なかったら0追加
+            if False != self.www_hanbetu(tmp_word):
+                if False !=tmp :
+                    df_time_www_point['point'][tmp]+=1
+                else :
+                    df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
+            else:
+                if False == tmp :
+                    df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
+            #拍手があったら1追加なかったら0追加
+            if False != self.hakusyu_hanbetu(df['comment'][i]):
+                if False !=tmp :
+                    df_time_88_point['point'][tmp]+=1
+                else :
+                    df_time_88_point = df_time_88_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
+            else:
+                if False == tmp :
+                    df_time_88_point = df_time_88_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
             #構文解析
             result = jumanpp.analysis(df['comment'][i])
             #print(result)
             #分析結果からdf作成
             for token in result.mrph_list():
-                tmp_word = token.midasi
-                # h:m:s -> hms　に変更
-                tmp_time = self.strtime_to_inttime(df['time'][i])
-                
-
-            #時間ごとのコメント数計算
-                tmp = self.my_index(df_time_point['time'],tmp_time)
-                if False !=tmp :
-                    df_time_point['point'][tmp]+=1
-                else :
-                    df_time_point = df_time_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
-                
-                if False != self.www_hanbetu(tmp_word):
-                    tmp = self.my_index(df_time_www_point['time'],tmp_time)
-                    if False !=tmp :
-                        df_time_www_point['point'][tmp]+=1
-                    else :
-                        df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
-                else:
-                    df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
-
-
-        #名詞の出現数計算
+                tmp_word = token.midasi   
+            #名詞の出現数計算
                 if 0 != self.word_Classification(token.hinsi):
                 #名詞なら
                     if self.word_Classification(token.hinsi) == '名詞':    
@@ -146,7 +156,7 @@ class DataGraph:
                     #名詞とその時の時間
                         df_time_word = df_time_word.append({'time':tmp_time,'word': tmp_word}, ignore_index=True)
 
-        return df_time_word,df_word_point,df_time_point,df_time_www_point
+        return df_time_word,df_word_point,df_time_point,df_time_www_point, df_time_hakusyu_point
 
 #---------------記号削除用プログラム-------------------
     def my_delete(self, string) :
@@ -168,13 +178,26 @@ class DataGraph:
             return'名詞'
         else :return 0
 
-#----------------www,（笑），草---------------------------
+#----------------笑い判別用プログラム---------------------------
     def www_hanbetu(self, word):
         if 'ww' in word:
-            return True
+            tmp=string.index('w')
+            if tmp == len(string)-1:
+                return True
+            if string[tmp + 1] == 'w':
+                return True
+            else :return False
         elif '笑' == word:
             return True
         elif '草' == word:
+            return True
+        else:return False 
+#----------------拍手判別用プログラム--------------------------
+    def hakusyu_hanbetu(self,string):
+        if '8' in string:
+            for char in string:
+                if char != 8:
+                    return False
             return True
         else:return False 
 
@@ -346,6 +369,78 @@ class DataGraph:
     def get_all_time(self, df_time_point):
         return df_time_point['time']
 #--------------------------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------散布図---------------------------------------------------------
+#----------------------------------wwwwww描画用-------------------------------------------
+#wwwの散布図表示用
+    def print_www(self,df,cutnum,flag='line'):
+        df = df_time__(df,cutnum,flag)
+        i = 0
+        ax = plt.figure(figsize=(30,10), dpi=50,facecolor='#FFFFFF')     
+        for tmp in df['point']:
+            y1 = np.random.rand(tmp)
+            x1 = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
+            color = self.rand_green(np.random.rand(1))
+            i+=1
+            plt.scatter(x1,y1, c=color,s=1800, marker="$w$",alpha=0.5)
+
+        plt.show()
+#色決め
+    def rand_green(self,rand):
+        if rand <= 0.1:
+            return '#66FF66'
+        elif rand <= 0.2 :
+            return '#00FF00'
+        elif rand <= 0.3 :
+            return '#00CC00'
+        elif rand <= 0.4 :
+            return '#33CC66'
+        elif rand <= 0.5 :
+            return '#99CC00'
+        elif rand <= 0.6 :
+            return '#006633'
+        elif rand <= 0.7 :
+            return '#003300'
+        elif rand <= 0.8 :
+            return '#99FF00'
+        elif rand <= 0.9 :
+            return '#99CC00'
+        elif rand <= 1.0 :
+            return '#339966'
+        else : return '#339966'
+#-----------------------------------------------------------拍手表示用---------------------------------------------------------
+#拍手散布図表示用
+    def print_hausyu(self,df,cutnum,flag='line',zoom=1):
+        df = self.df_time__(df,cutnum,flag)
+        i = 0
+        fig, ax = plt.subplots()     
+        image_path ='1922466.png'
+       
+        for tmp in df['point']:
+            y = np.random.rand(tmp)
+            x = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
+            self.imscatter(x, y, image_path, ax=ax,  zoom=.25)    
+            ax.plot(x, y, 'ko',alpha=0)
+        #plt.savefig('cactus_plot.png',dpi=200, transparent=False) 
+        plt.show()
+
+    def imscatter(self,x, y, image, ax=None, zoom=1): 
+        if ax is None: 
+            ax = plt.gca() 
+        try: 
+            image = plt.imread(image) 
+        except TypeError: 
+        # Likely already an array... 
+            pass 
+        im = OffsetImage(image, zoom=zoom) 
+        x, y = np.atleast_1d(x, y) 
+        artists = [] 
+        for x0, y0 in zip(x, y): 
+            ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=False) 
+            artists.append(ax.add_artist(ab)) 
+        ax.update_datalim(np.column_stack([x, y])) 
+        ax.autoscale() 
+        return artists 
+#--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------折れ線グラフ---------------------------------------------------------
 
 #----------------------折れ線グラフ描画----------------------------------------------
@@ -427,7 +522,7 @@ class DataGraph:
         #csvファイルをデータフレームに変換
         #df = csv_df(data)
         #コメントデータからデータ抽出＆データフレーム作成
-        df_time_word,df_word_point,df_time_point,df_time_www_point = self.string_word_point(df)
+        df_time_word,df_word_point,df_time_point,df_time_www_point,df_time_hakusyu_point = self.string_word_point(df)
         #人とその人のコメント数のdf作成
         df_contributor_point = self.make_df_contributor_point(df)
 
@@ -449,6 +544,9 @@ class DataGraph:
         #self.print_line_graph( df_time_contributor_point_line,rank_contributor,5)
         #self.print_line_graph( df_time_contributor_point_stack,rank_contributor,5,'stack')
         #self.print_line_graph(df_time_negapozi,'negapozi',5)
+        #self.print_www( df_time_www_point,100)
+        #self.print_hakusyu(df_time_hakusyu_point,100)
+    
 
         #棒グラフ出力用
         #self.print_bar_graph_df(df_word_point,'word')
