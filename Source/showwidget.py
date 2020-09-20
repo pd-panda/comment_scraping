@@ -34,6 +34,7 @@ import pandas as pd
 #from Source.commentscraper import Scraper
 from Source.data_glaph import DataGraph
 from Source.getcomment import GetComment
+from Source.commentscraper import Scraper
 
 # Kivy言語のBuilder
 from kivy.lang import Builder
@@ -43,6 +44,7 @@ Builder.load_file("./Source/test.kv")
 #scr = Scraper()
 dataglp = DataGraph()
 getcomment = GetComment()
+scr = Scraper()
 
 # デフォルトに使用するフォントを変更する
 resource_add_path('./Source/fonts')
@@ -88,6 +90,13 @@ class GraphView(BoxLayout):
         #self.plt.imshow(img) # 画像の描画
         #self.get_center_yplt.show() # 描画結果の表示
 
+        self.ax.axis('off')
+
+        # 再描画する
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+
+
         # 再描画する
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
@@ -98,6 +107,17 @@ class GraphView(BoxLayout):
         global df
         # テキストファイルからdfの生成
         df = getcomment.main(loadfilepath, savefilepath)
+        print(df)
+        self.update_view(df, "func1")
+    
+    def load_scrapingdata(self):
+        print("scraper start!")
+        global df
+        df = scr.main("カフカ読書会", True)
+        # スレッド処理で返り値を受け取るようにしたい・・・
+        #t1 = threading.Thread(target=scr.main, args=["カフカ読書会"])
+        #t1.start()
+        print("scraper end!!!")
         print(df)
         self.update_view(df, "func1")
 
@@ -173,13 +193,13 @@ class ShowWidget(Widget):
         self.color = [0, 1, 1 , 1]
 
     def buttonClickedroom(self):        # ボタンをクリック時
-        self.text = 'room名より取得'
+        #self.text = 'room名より取得'
         self.source = imagedir + 'lefton.png'
         self.color = [0, 1, 1 , 1]
         print("buttonClickedroom!!!")
 
     def buttonClickedfile(self):        # ボタンをクリック時
-        self.text = 'ファイルから取得'
+        #self.text = 'ファイルから取得'
         self.source = imagedir + 'righton.png'
         self.color = [0, 1, 1 , 1]
         print("buttonClickedfile!!!")
@@ -195,12 +215,6 @@ class ShowWidget(Widget):
     def checkbox_check3(self, checkbox):
         self.check3 = checkbox.active
         return
-
-    def buttonClickedroomDone(self):
-        #print("scraper start!")
-        #t1 = threading.Thread(target=scr.main, args=["カフカ読書会"])
-        #t1.start()
-        print("scraper end!!!")
 
     def plottest(self):
         glp.main()

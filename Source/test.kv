@@ -95,7 +95,7 @@
                                     id: button1
                                     background_normal: './Source/image/buttonimg.png'
                                     background_down: './Source/image/downbuttonimg.png'
-                                    on_press: root.buttonClickedroomDone()  # ボタンをクリックした時にpython側の関数を呼ぶ
+                                    on_press: root.ids.graph_view.load_scrapingdata()  # ボタンをクリックした時にpython側の関数を呼ぶ
                     TabbedPanelItem:
                         tab_pos: 'top_mid'
                         text: 'ファイルで\n実行'

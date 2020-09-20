@@ -109,7 +109,8 @@ class DataGraph:
             #print(df_word_point)
             #記号削除中
             df['comment'][i] = self.my_delete(df['comment'][i])
-            df['contributor'][i] = self.my_delete(df['contributor'][i])
+            #df['contributor'][i] = self.my_delete(df['contributor'][i])
+            
             # h:m:s -> hms　に変更
             tmp_time = self.strtime_to_inttime(df['time'][i])
             
@@ -138,6 +139,7 @@ class DataGraph:
             else:
                 if False == tmp :
                     df_time_88_point = df_time_88_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
+
             #構文解析
             result = jumanpp.analysis(df['comment'][i])
             #print(result)
@@ -161,6 +163,7 @@ class DataGraph:
 
 #---------------記号削除用プログラム-------------------
     def my_delete(self, string) :
+        print(string)
         if '\n' in string:
             string = string.replace('\n', ' ')
         if '@' in string:
@@ -558,7 +561,7 @@ class DataGraph:
 #--------------------------------------------
 
 
-    def init_graph(self, df) :
+    def init_graph(self, df, scr_case = False) :
 
         """
         入力DataFrameを用いてグラフ描画用dfを初期化する
@@ -570,7 +573,9 @@ class DataGraph:
         
         fig, ax : 描画したい描画範囲の指定
         """
-
+        print("関数内DF表示")
+        print(df)
+        self.scr_case = scr_case
     #------------データ作成----------------
         #感情推定用df
         self.df_kanzyou = self.csv_df('kanzyou.csv')
@@ -579,16 +584,19 @@ class DataGraph:
         #コメントデータからデータ抽出＆データフレーム作成
         self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point = self.string_word_point(df)
         #人とその人のコメント数のdf作成
-        self.df_contributor_point = self.make_df_contributor_point(df)
+        if (scr_case == False):
+            self.df_contributor_point = self.make_df_contributor_point(df)
 
         #各時間でのネガティブかポジティブかをdfに
         self.df_time_negapozi = self.make_df_time_negapozi(self.df_time_word,self.df_time_point,self.df_kanzyou)
         #各時間の単語ごとの出現数のdf作成
         self.df_time_word_point_stack,self.df_time_word_point_line = self.time_word_point(self.df_time_word,self.df_word_point,self.df_time_point)
-        #各時間の人ごとの出現数のdf作成
-        self.df_time_contributor_point_stack,self.df_time_contributor_point_line = self.time_contributor_point(df,self.df_time_point,self.df_contributor_point)
-    #------------------保存変数-----------------------------------
-        self.rank_contributor = self.make_rank_word(2,self.df_contributor_point,'contributor')
+        if (scr_case == False):
+            #各時間の人ごとの出現数のdf作成
+            self.df_time_contributor_point_stack,self.df_time_contributor_point_line = self.time_contributor_point(df,self.df_time_point,self.df_contributor_point)
+        #------------------保存変数-----------------------------------
+            self.rank_contributor = self.make_rank_word(2,self.df_contributor_point,'contributor')
+        
         self.rank_word  = self.make_rank_word(5,self.df_word_point,'word')
 
     def switch_graph(self, fig, ax, graph_name = "treemap") :
@@ -599,16 +607,16 @@ class DataGraph:
         elif (graph_name == "bargraph_word"):
             self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
 
-        elif (graph_name == "bargraph_contributor"):
+        elif (graph_name == "bargraph_contributor" and self.scr_case == False):
             self.print_bar_graph_df(self.df_contributor_point,'contributor', fig, ax)
 
         elif (graph_name == "df_time_word_point_line_100"):
             self.print_line_graph(self.df_time_word_point_line,self.rank_word,100,fig, ax)
 
-        elif (graph_name == "df_time_word_point_line_5"):
+        elif (graph_name == "df_time_word_point_line_5" and self.scr_case == False):
             self.print_line_graph(self.df_time_contributor_point_line,self.rank_contributor,5,fig, ax)
 
-        elif (graph_name == "df_time_word_point_stack_5"):
+        elif (graph_name == "df_time_word_point_stack_5" and self.scr_case == False):
             self.print_line_graph(self.df_time_contributor_point_stack,self.rank_contributor,5, fig, ax, 'stack')
 
         elif (graph_name == "df_time_negapozi_5"):
