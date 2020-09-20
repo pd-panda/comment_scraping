@@ -386,13 +386,28 @@ class DataGraph:
     def print_www(self,df,cutnum, fig, ax, flag='line'):
         df = self.df_time__(df,cutnum,flag)
         i = 0
+        plt.tick_params(labelbottom=True,
+            labelleft=False,
+            labelright=False,
+            labeltop=False)
+        flag = False
+        colx = df[df.columns[0]]
         #ax = plt.figure(figsize=(30,10), dpi=50,facecolor='#FFFFFF')     
         for tmp in df['point']:
-            y1 = np.random.rand(tmp)
-            x1 = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
+            x =[]
+            y = np.random.rand(tmp)
+            for j in range(tmp):
+                x = x + [colx[i]]
             color = self.rand_green(np.random.rand(1))
+            if tmp > 0:
+                flag = True
             i+=1
-            plt.scatter(x1,y1, c=color,s=1800, marker="$w$",alpha=0.5)
+            plt.scatter(x,y, c=color,s=1800, marker="$w$",alpha=0.5)
+        if  flag == True:
+            if len(colx) > 5:
+            # 時間のラベルを5個に変更
+                plt.xticks(colx[0::(-(-len(colx)//5))])        
+
 
         #plt.show()
 #色決め
@@ -423,16 +438,31 @@ class DataGraph:
     def print_hakusyu(self,df,cutnum, fig, ax,flag='line'):
         df = self.df_time__(df,cutnum,flag)
         i = 0
+        flag = False
         #fig, ax = plt.subplots()     
         image_path ='1922466.png'
+        colx = df[df.columns[0]]
+        plt.tick_params(labelbottom=True,
+                labelleft=False,
+                labelright=False,
+                labeltop=False)
+    
        
         for tmp in df['point']:
+            x =[]
             y = np.random.rand(tmp)
-            x = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
+            if tmp > 0:
+                flag = True
+            for j in range(tmp):
+                x = x + [colx[i]]
             self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) # path.join()
             ax.plot(x, y, 'ko',alpha=0)
         #plt.savefig('cactus_plot.png',dpi=200, transparent=False) 
         #plt.show()
+        if  flag == True:
+            if len(colx) > 5:
+                # 時間のラベルを5個に変更
+                plt.xticks(colx[::(-(-len(colx)//5))])
 
     def imscatter(self,x, y, image, ax=None, zoom=1): 
         if ax is None: 
@@ -501,7 +531,7 @@ class DataGraph:
                 time = str(int((start%1000000)/10000)) + ':' +str(int((start%10000)/100))+':'+str(start%100)
                 tmp.insert(0, time)
                 df_2 = pd.DataFrame([tmp],columns=df_result.columns)
-                df_result = pd.concat([df_result, df_2])
+                df_result = pd.concat([df_result, df_2], ignore_index=True)
                 tmp = tmp[1:]
                 
                 if flag == 'line' :
