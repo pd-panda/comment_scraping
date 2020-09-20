@@ -140,24 +140,24 @@ class DataGraph:
                 if False == tmp :
                     df_time_88_point = df_time_88_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
 
-            #構文解析
-            result = jumanpp.analysis(df['comment'][i])
-            #print(result)
-            #分析結果からdf作成
-            for token in result.mrph_list():
-                tmp_word = token.midasi   
-            #名詞の出現数計算
-                if 0 != self.word_Classification(token.hinsi):
-                #名詞なら
-                    if self.word_Classification(token.hinsi) == '名詞':    
-                        tmp = self.my_index(df_word_point['word'],tmp_word)
-                        if False != tmp :
-                            df_word_point['point'][tmp] += 1
-                        else :
-                            df_word_point = df_word_point.append({'word':tmp_word,'point': 1}, ignore_index=True)
+                #構文解析
+                result = jumanpp.analysis(df['comment'][i])
+                #print(result)
+                #分析結果からdf作成
+                for token in result.mrph_list():
+                    tmp_word = token.midasi   
+                #名詞の出現数計算
+                    if 0 != self.word_Classification(token.hinsi):
+                    #名詞なら
+                        if self.word_Classification(token.hinsi) == '名詞':    
+                            tmp = self.my_index(df_word_point['word'],tmp_word)
+                            if False != tmp :
+                                df_word_point['point'][tmp] += 1
+                            else :
+                                df_word_point = df_word_point.append({'word':tmp_word,'point': 1}, ignore_index=True)
 
-                    #名詞とその時の時間
-                        df_time_word = df_time_word.append({'time':tmp_time,'word': tmp_word}, ignore_index=True)
+                        #名詞とその時の時間
+                            df_time_word = df_time_word.append({'time':tmp_time,'word': tmp_word}, ignore_index=True)
 
         return df_time_word,df_word_point,df_time_point,df_time_www_point, df_time_hakusyu_point
 
