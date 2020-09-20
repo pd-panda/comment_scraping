@@ -40,27 +40,55 @@ class GetComment:
         datalist : list of str
             抽出したデータリスト。[[time],[text],[name]]
         """
-        readtxtlist = textdata.split('\t 開始 ')
+        readtxtlist = textdata.split('\n')
         timelist = []
         namelist = []
         textlist = []
-        for a in readtxtlist:
-            if len(a.rsplit('\n',1)) == 1:
-                timelist.append(a)
-            else:
-                if a.rsplit('\n',1)[1] != '':
-                    timelist.append(a.rsplit('\n',1)[1])
-                tx = a.rsplit('\n',1)[0].split(' : ')
-                if len(tx) == 2:
-                    namelist.append(tx[0].replace('\n', ''))
-                    textlist.append(tx[1].replace('\n', ''))
+
+        if '開始 ' in readtxtlist[0]:
+            #print("chat directsave ¥t")
+            #print(len(readtxtlist[0].split('\t')))
+            count = 0
+            for a in readtxtlist[:len(readtxtlist)-1:]:
+                if len(a.split('\t')) == 1:
+                    textlist[-1]+=a.split('\t')[0]
+                else:
+                    timelist.append(a.split('\t')[0])
+                    namelist.append(a.split('\t')[1].split(' : ')[0])
+                    textlist.append(a.split('\t')[1].split(' : ')[1])
+            
+            #print(count)
+        else:
+            for a in readtxtlist:
+                #print(a)
+                #print(len(a.split('\t')))
+                if len(a.split('\t')) == 1:
+                    #textlist.append(a.split('\t')[0])
+                    textlist[-1]+=a.split('\t')[0]
+                else:
+                    timelist.append(a.split('\t')[0])
+                    namelist.append(a.split('\t')[1])
+                    textlist.append(a.split('\t')[2])
+            #if len(a.rsplit('\n',1)) == 1:
+            #    timelist.append(a)
+            #else:
+            #    namelist.append(a.rsplit('\n',1)[1])
+            #    textlist.append(a.rsplit('\n',1)[0])
+            #    print("text",a)
+                #if a.rsplit('\n',1)[1] != '':
+                #    timelist.append(a.rsplit('\n',1)[1])
+                #tx = a.rsplit('\n',1)[0].split(' : ')
+                #if len(tx) == 2:
+                #    namelist.append(tx[0].replace('\n', ''))
+                #    textlist.append(tx[1].replace('\n', ''))
         datalist = []
         datalist.append(timelist)
         datalist.append(textlist)
         datalist.append(namelist)
+        #print(datalist)
         return datalist
     
-    def get_df_from_datalist(self, datalist, indexs=['time', 'comment', 'contributor']):
+    def get_df_from_datalist(self, datalist, columns=['time', 'comment', 'contributor']):
         """
         datalistからdetaframeを生成する
 
@@ -74,9 +102,9 @@ class GetComment:
 
         Returns
         -------
-            インデックス付きのdataframe
+            カラム付きのdataframe
         """
-        return pd.DataFrame(datalist, index=indexs)
+        return pd.DataFrame(datalist, index=columns).T
     
     def save_csv_from_df(self, df, path):
         """
@@ -92,7 +120,7 @@ class GetComment:
         """
         df.to_csv(path)
     
-    def main(self, filepath, savefilepath, indexs):
+    def main(self, filepath, savefilepath, columns=['time', 'comment', 'contributor']):
         """
         Parameters
         ----------
@@ -107,8 +135,11 @@ class GetComment:
         """
         textlist = self.get_textdata_from_path(filepath)
         datalist = self.get_datalist_from_textdata(textlist)
-        df = self.get_df_from_datalist(datalist, indexs)
+        df = self.get_df_from_datalist(datalist, columns)
         self.save_csv_from_df(df, savefilepath)
+        #print("関数内df表示")
+        #print(df)
+        return df
 
 
 if __name__ == "__main__":

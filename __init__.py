@@ -33,14 +33,16 @@ except ImportError:
   print("Trying to Install required module: bs4")
   os.system('conda install -c conda-forge bs4')
 
+
 try:
   import selenium
 except ImportError:
   print("Trying to Install required module: selenium")
-  os.system('conda install -c conda-forge selenium')
+  os.system('pip install selenium')
+
   
 #ここから，内部処理用
- 
+
 try:
   import datetime
 except ImportError:
@@ -63,13 +65,13 @@ try:
   import squarify
 except ImportError:
   print("Trying to Install required module: squarify")
-  os.system('conda install -c conda-forge squarify')
+  os.system('pip install squarify')
 
 try:
   from pyknp import Juman
 except ImportError:
   print("Trying to Install required module: Juman")
-  os.system('conda install -c temporary-recipes pyknp')
+  os.system('pip install pyknp')
 
 try:
   import japanize_matplotlib
@@ -77,10 +79,10 @@ except ImportError:
   print("Trying to Install required module: japanize_matplotlib")
   os.system('pip install japanize-matplotlib')
 
-from Source.showwidget import TestApp
+from Source.showwidget import CommentShowApp
 
 
 if __name__ == '__main__':
-    shw = TestApp()
+    shw = CommentShowApp()
     print("ss")
     shw.run()
