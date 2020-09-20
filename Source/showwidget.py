@@ -116,7 +116,8 @@ class GraphView(BoxLayout):
 
         #dataglp.main_graph_test(df, self.fig, self.ax)
         dataglp.init_graph(df)
-        dataglp.switch_graph(self.fig, self.ax, "df_time_word_point_line_100") 
+        #dataglp.switch_graph(self.fig, self.ax, "df_time_word_point_line_100")
+        dataglp.switch_graph(self.fig, self.ax, "treemap")
 
         # グラフの見栄えを調整する
         #self.ax.relim()
