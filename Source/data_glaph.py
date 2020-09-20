@@ -200,7 +200,12 @@ class DataGraph:
     def hakusyu_hanbetu(self,string):
         if '8' in string:
             for char in string:
-                if char != 8:
+                if char != '8':
+                    return False
+            return True
+        if '８' in string:
+            for char in string:
+                if char != '８':
                     return False
             return True
         else:return False 
