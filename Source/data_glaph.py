@@ -18,6 +18,7 @@ import shutil
 import squarify#
 import seaborn as sns#
 import codecs
+import numpy as np
 # coding:utf-8
 import csv
 from bs4 import BeautifulSoup#
