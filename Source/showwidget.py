@@ -170,6 +170,9 @@ class GraphView(BoxLayout):
         elif funcname == "func5":
             print("func5 play")
             dataglp.switch_graph(self.fig, self.ax, "df_time_hakusyu_point_100")
+        elif funcname == "func6":
+            print("func5 play")
+            print(dataglp.get_all_URL())
 
 class SubGrids(GridLayout): 
     def __init__(self, **kwargs): 

@@ -129,7 +129,11 @@ class DataGraph:
             else :
                 df_time_point = df_time_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
             #wwwがあったら1追加なかったら0追加
-            if False != self.www_hanbetu(tmp_word):
+            print(url)
+            if False != self.www_hanbetu(df['comment'][i]) and url == False:
+                print("!????")
+                print(url)
+            #if False != self.www_hanbetu(tmp_word):
                 if False !=tmp :
                     df_time_www_point['point'][tmp]+=1
                 else :
@@ -166,7 +170,7 @@ class DataGraph:
                         #名詞とその時の時間
                             df_time_word = df_time_word.append({'time':tmp_time,'word': tmp_word}, ignore_index=True)
 
-        return df_time_word,df_word_point,df_time_point,df_time_www_point, df_time_hakusyu_point
+        return df_time_word,df_word_point,df_time_point,df_time_www_point,df_time_hakusyu_point,df_URL
 
 #---------------記号削除用プログラム-------------------
     def my_delete(self, string) :
@@ -192,10 +196,10 @@ class DataGraph:
 #----------------笑い判別用プログラム---------------------------
     def www_hanbetu(self, word):
         if 'ww' in word:
-            tmp=string.index('w')
-            if tmp == len(string)-1:
+            tmp=word.index('w')
+            if tmp == len(word)-1:
                 return True
-            if string[tmp + 1] == 'w':
+            if word[tmp + 1] == 'w':
                 return True
             else :return False
         elif '笑' == word:
@@ -392,6 +396,10 @@ class DataGraph:
     # コメント投稿時間を全て取得
     def get_all_time(self, df_time_point):
         return df_time_point['time']
+    
+    # 投稿されたURLを全て取得
+    def get_all_URL(self):
+        return self.df_URL
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------散布図---------------------------------------------------------
 #----------------------------------wwwwww描画用-------------------------------------------
