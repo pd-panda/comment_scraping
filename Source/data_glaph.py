@@ -29,6 +29,7 @@ from pyknp import Juman#
 import warnings
 warnings.filterwarnings('ignore')
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from urllib.parse import urlparse
 sourcedir = "./Source"
 
 class DataGraph:
@@ -103,9 +104,13 @@ class DataGraph:
         df_time_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のコメント数のｄｆ
         df_time_www_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のwww数のｄｆ
         df_time_hakusyu_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時の拍手数のｄｆ
-
+        df_URL = pd.DataFrame(index=[], columns=['URL'])#URLまとめdf
+        
         #print(df_word_point)
         for i in range(len(df)):
+            url=self.URL_hanbetu(df['comment'][i])
+            if url != False:
+                df_URL = df_URL.append({'URL':url}, ignore_index=True)
             #print("記号削除前")
             #print(df_word_point)
             #記号削除中
@@ -211,6 +216,14 @@ class DataGraph:
                     return False
             return True
         else:return False 
+#----------------URL判別用プログラム--------------------------
+    def URL_hanbetu(self,string):
+        parsed_url = urlparse(string)
+        if 'h' in parsed_url.scheme:
+            url = '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(string))
+        else : url = False
+    
+        return url 
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 #------------------------いろんなdf作成------------------------------------------------------
@@ -619,7 +632,7 @@ class DataGraph:
         #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
 
         #コメントデータからデータ抽出＆データフレーム作成
-        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point = self.string_word_point(df)
+        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point,self.df_URL = self.string_word_point(df)
         #人とその人のコメント数のdf作成
         if (scr_case == False):
             self.df_contributor_point = self.make_df_contributor_point(df)
