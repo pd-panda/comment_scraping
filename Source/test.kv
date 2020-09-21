@@ -177,93 +177,184 @@
                 size_hint_y: 0.6
             ScrollView:
                 size_hint_y: 0.4
-                GridLayout:
-                    cols:2
+                #GridLayout:
+                #    cols:1
+                #    size_hint_y: None
+                #    row_default_height: 200
+                #    height: self.minimum_height
+                BoxLayout:
+                    orientation: 'horizontal'
                     size_hint_y: None
                     row_default_height: 200
                     height: self.minimum_height
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        size_hint_y: 0.15
-                        CheckBox:
-                            group: 'radio'
-                            size_hint_x: 0.3
-                            active: root.ids.graph_view.check
-                            on_press: root.ids.graph_view.checkbox_check(self, "func1")
-                        Label:
-                            text: "コメント数"
-                            color: [0.23,0.23,0.23,1]
-                            size_hint_x: 0.7
-                            font_size: 24
-                            halign: 'left'
-                            valign: 'middle'
-                            text_size: self.size
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        size_hint_y: 0.15
-                        CheckBox:
-                            group: 'radio'
-                            size_hint_x: 0.3
-                            active: root.ids.graph_view.check
-                            on_press: root.ids.graph_view.checkbox_check(self, "func2")
-                        Label:
-                            text: "TreeMap"
-                            color: [0.23,0.23,0.23,1]
-                            size_hint_x: 0.7
-                            font_size: 24
-                            halign: 'left'
-                            valign: 'middle'
-                            text_size: self.size
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        size_hint_y: 0.15
-                        CheckBox:
-                            group: 'radio'
-                            size_hint_x: 0.3
-                            active: root.ids.graph_view.check
-                            on_press: root.ids.graph_view.checkbox_check(self, "func3")
-                        Label:
-                            text: "投稿者数"
-                            color: [0.23,0.23,0.23,1]
-                            size_hint_x: 0.7
-                            font_size: 24
-                            halign: 'left'
-                            valign: 'middle'
-                            text_size: self.size
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        size_hint_y: 0.15
-                        CheckBox:
-                            group: 'radio'
-                            size_hint_x: 0.3
-                            active: root.ids.graph_view.check
-                            on_press: root.ids.graph_view.checkbox_check(self, "func4")
-                        Label:
-                            text: "笑い検出"
-                            color: [0.23,0.23,0.23,1]
-                            size_hint_x: 0.7
-                            font_size: 24
-                            halign: 'left'
-                            valign: 'middle'
-                            text_size: self.size
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        size_hint_y: 0.15
-                        CheckBox:
-                            group: 'radio'
-                            size_hint_x: 0.3
-                            active: root.ids.graph_view.check
-                            on_press: root.ids.graph_view.checkbox_check(self, "func5")
-                        Label:
-                            text: "拍手検出"
-                            color: [0.23,0.23,0.23,1]
-                            size_hint_x: 0.7
-                            font_size: 24
-                            halign: 'left'
-                            valign: 'middle'
-                            text_size: self.size
-                    BoxLayout:
-                        size_hint_y: 0.25
-                
+                    GridLayout:
+                        cols:1
+                        size_hint_y: None
+                        #size_hint_y: 0.5
+                        #row_default_height: 10
+                        height: self.minimum_height
+                        size_hint_x: 0.5
+                        padding: [10, 25] 
+                        spacing: [10, 35] 
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func1")
+                            Label:
+                                text: "コメント数"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func2")
+                            Label:
+                                text: "TreeMap"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func3")
+                            Label:
+                                text: "投稿者数"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func4")
+                            Label:
+                                text: "笑い検出"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+                            Label:
+                                text: "拍手検出"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        # デバッグ用
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+                            Label:
+                                text: "拍手検出"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+                            Label:
+                                text: "拍手検出"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+                            Label:
+                                text: "拍手検出"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.3
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+                            Label:
+                                text: "拍手検出"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.7
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                    Grids:
+                        size_hint_x: 0.5
+                    
                     
 <GraphView>:
+
+<Grids>:

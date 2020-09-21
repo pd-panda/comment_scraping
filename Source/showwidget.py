@@ -13,6 +13,9 @@ from kivy.core.window import Window
 from kivy.resources import resource_add_path
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout 
+from kivy.uix.label import Label 
+
 # kivy.unix.popupクラスを使ってPopUpを生成する
 from kivy.uix.popup import Popup
 
@@ -105,12 +108,16 @@ class GraphView(BoxLayout):
         # テキストファイル読み込み
         global loadfilepath
         global df
+        print(os.path.splitext(loadfilepath)[1])
         # テキストファイルからdfの生成
-        if (os.path.splitext(loadfilepath) == '.txt'):
+        if (os.path.splitext(loadfilepath)[1] == '.txt'):
+            print(".txt 抽出")
             df = getcomment.main(loadfilepath, savefilepath)
-        elif (os.path.splitext(loadfilepath) == '.csv'):
+        elif (os.path.splitext(loadfilepath)[1] == '.csv'):
+            print(".csv 抽出")
             df = dataglp.csv_df(loadfilepath)
         else : # error処理
+            print("どちらでもありません")
             return
         print(df)
         dataglp.init_graph(df)
@@ -164,6 +171,27 @@ class GraphView(BoxLayout):
             print("func5 play")
             dataglp.switch_graph(self.fig, self.ax, "df_time_hakusyu_point_100")
 
+class SubGrids(GridLayout): 
+    def __init__(self, **kwargs): 
+        GridLayout.__init__(self, cols=3, rows=3); 
+        self.add_widget(Label(text='1st')); 
+        self.add_widget(Label(text='')); 
+        self.add_widget(Label(text='2nd')); 
+        self.add_widget(Label(text='')); 
+        self.add_widget(Label(text='3rd')); 
+        self.add_widget(Label(text='')); 
+        self.add_widget(Label(text='4th')); 
+        self.add_widget(Label(text='')); 
+        self.add_widget(Label(text='5th')); 
+
+class Grids(GridLayout): 
+    def __init__(self, **kwargs): 
+        pass
+        GridLayout.__init__(self, cols=2, rows = 2); 
+        self.add_widget(SubGrids()); 
+        self.add_widget(SubGrids()); 
+        self.add_widget(SubGrids()); 
+        self.add_widget(SubGrids()); 
 
 #glp = GraphView()
 
@@ -243,7 +271,7 @@ class ShowWidget(Widget):
 class CommentShowApp(App):
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(CommentShowApp, self).__init__(**kwargs)
         self.title = 'コメント見える君'
     
     def build(self):
