@@ -29,6 +29,7 @@ from pyknp import Juman#
 import warnings
 warnings.filterwarnings('ignore')
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+from urllib.parse import urlparse
 sourcedir = "./Source"
 
 class DataGraph:
@@ -103,9 +104,13 @@ class DataGraph:
         df_time_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のコメント数のｄｆ
         df_time_www_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のwww数のｄｆ
         df_time_hakusyu_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時の拍手数のｄｆ
-
+        df_URL = pd.DataFrame(index=[], columns=['URL'])#URLまとめdf
+        
         #print(df_word_point)
         for i in range(len(df)):
+            url=self.URL_hanbetu(df['comment'][i])
+            if url != False:
+                df_URL = df_URL.append({'URL':url}, ignore_index=True)
             #print("記号削除前")
             #print(df_word_point)
             #記号削除中
@@ -211,6 +216,14 @@ class DataGraph:
                     return False
             return True
         else:return False 
+#----------------URL判別用プログラム--------------------------
+    def URL_hanbetu(self,string):
+        parsed_url = urlparse(string)
+        if 'h' in parsed_url.scheme:
+            url = '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(string))
+        else : url = False
+    
+        return url 
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 #------------------------いろんなdf作成------------------------------------------------------
@@ -386,13 +399,28 @@ class DataGraph:
     def print_www(self,df,cutnum, fig, ax, flag='line'):
         df = self.df_time__(df,cutnum,flag)
         i = 0
+        plt.tick_params(labelbottom=True,
+            labelleft=False,
+            labelright=False,
+            labeltop=False)
+        flag = False
+        colx = df[df.columns[0]]
         #ax = plt.figure(figsize=(30,10), dpi=50,facecolor='#FFFFFF')     
         for tmp in df['point']:
-            y1 = np.random.rand(tmp)
-            x1 = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
+            x =[]
+            y = np.random.rand(tmp)
+            for j in range(tmp):
+                x = x + [colx[i]]
             color = self.rand_green(np.random.rand(1))
+            if tmp > 0:
+                flag = True
             i+=1
-            plt.scatter(x1,y1, c=color,s=1800, marker="$w$",alpha=0.5)
+            plt.scatter(x,y, c=color,s=1800, marker="$w$",alpha=0.5)
+        if  flag == True:
+            if len(colx) > 5:
+            # 時間のラベルを5個に変更
+                plt.xticks(colx[0::(-(-len(colx)//5))])        
+
 
         #plt.show()
 #色決め
@@ -423,16 +451,31 @@ class DataGraph:
     def print_hakusyu(self,df,cutnum, fig, ax,flag='line'):
         df = self.df_time__(df,cutnum,flag)
         i = 0
+        flag = False
         #fig, ax = plt.subplots()     
         image_path ='1922466.png'
+        colx = df[df.columns[0]]
+        plt.tick_params(labelbottom=True,
+                labelleft=False,
+                labelright=False,
+                labeltop=False)
+    
        
         for tmp in df['point']:
+            x =[]
             y = np.random.rand(tmp)
-            x = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
+            if tmp > 0:
+                flag = True
+            for j in range(tmp):
+                x = x + [colx[i]]
             self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) # path.join()
             ax.plot(x, y, 'ko',alpha=0)
         #plt.savefig('cactus_plot.png',dpi=200, transparent=False) 
         #plt.show()
+        if  flag == True:
+            if len(colx) > 5:
+                # 時間のラベルを5個に変更
+                plt.xticks(colx[::(-(-len(colx)//5))])
 
     def imscatter(self,x, y, image, ax=None, zoom=1): 
         if ax is None: 
@@ -501,7 +544,7 @@ class DataGraph:
                 time = str(int((start%1000000)/10000)) + ':' +str(int((start%10000)/100))+':'+str(start%100)
                 tmp.insert(0, time)
                 df_2 = pd.DataFrame([tmp],columns=df_result.columns)
-                df_result = pd.concat([df_result, df_2])
+                df_result = pd.concat([df_result, df_2], ignore_index=True)
                 tmp = tmp[1:]
                 
                 if flag == 'line' :
@@ -589,7 +632,7 @@ class DataGraph:
         #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
 
         #コメントデータからデータ抽出＆データフレーム作成
-        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point = self.string_word_point(df)
+        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point,self.df_URL = self.string_word_point(df)
         #人とその人のコメント数のdf作成
         if (scr_case == False):
             self.df_contributor_point = self.make_df_contributor_point(df)
