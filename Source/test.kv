@@ -151,7 +151,8 @@
                                     background_down: './Source/image/downbuttonimg.png'
                                     #on_press: root.buttonClicked1()  # ボタンをクリックした時にpython側の関数を呼ぶ
                                     #on_press: root.ids.graph_view.init_graph()
-                                    on_press: root.ids.graph_view.load_data()
+                                    #on_press: root.ids.graph_view.load_data()
+                                    on_press: root.conpanel()
 
                 BoxLayout:
                     size_hint_y: root.height - 725
@@ -307,9 +308,9 @@
                                 group: 'radio'
                                 size_hint_x: 0.3
                                 active: root.ids.graph_view.check
-                                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+                                on_press: root.ids.graph_view.checkbox_check(self, "func7")
                             Label:
-                                text: "拍手検出"
+                                text: "URLランキング"
                                 color: [0.23,0.23,0.23,1]
                                 size_hint_x: 0.7
                                 font_size: 24
@@ -351,10 +352,13 @@
                                 halign: 'left'
                                 valign: 'middle'
                                 text_size: self.size
-                    Grids:
-                        size_hint_x: 0.5
-                    
+                    Panels:
+                        id: conpanel
                     
 <GraphView>:
 
-<Grids>:
+<ConfigPanel>:
+
+<SubGrids>:
+
+<Panels>:
