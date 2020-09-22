@@ -76,10 +76,7 @@ class ConfigPanel(GridLayout):
     def __init__(self, word, **kwargs): 
         super().__init__(**kwargs)
         # test用　データがなくても表示されるよ
-        GridLayout.__init__(self, cols=1, rows=3)
-        self.add_widget(SubGrids(word="aaa"))
-        self.add_widget(SubGrids(word="bbb"))
-        self.add_widget(SubGrids(word="ccc"))
+        #GridLayout.__init__(self, cols=1, rows=3)
         #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
         #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
         #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
@@ -92,17 +89,17 @@ class ConfigPanel(GridLayout):
             print("ファイルが読み込まれていません")
         else:
             print("ファイルが読み込まれました")
-            self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
-            
-            """
+            #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+            #self.add_widget(SubGrids(word="aaa"))
             self.clear_widgets()
+            GridLayout.__init__(self, cols=1, rows=len(word_df))
             #self.add_widget(Label(text="単語一覧", color=[0.23,0.23,0.23,1]))
-            self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
-            GridLayout.__init__(self, cols=2, rows=-(-len(word_df)//2))
+            #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+            #GridLayout.__init__(self, cols=2, rows=-(-len(word_df)//2))
             for _, str_word in (dataglp.get_all_word()).iteritems():
                 print(str_word)
-                self.add_widget(SubGrids(str_word))
-            """
+                self.add_widget(SubGrids(word=str_word))
+            
         pass
 
 
@@ -117,20 +114,24 @@ class Panels(GridLayout):
         #self.add_widget(Label(text= lists[0]))
         #self.add_widget(Label(text= lists[0]))
         #self.add_widget(Label(text= lists[1]))
-
+        """
         # 縦に（チェックボックス , ラベル）の塊を表示したい
         self.add_widget(ConfigPanel("aaa"))
         self.add_widget(ConfigPanel("bbb"))
         self.add_widget(ConfigPanel("ccc"))
+        """
         #self.add_widget(ConfigPanel("ddd"))
-        """
-        def make_config_panel(self, lists):
-            #self.clear_widgets()
-            print(len(lists))
-            #GridLayout.__init__(self, cols=1, rows=len(lists))
-            self.add_widget(ConfigPanel("aaa"))
-            self.add_widget(ConfigPanel("bbb"))
-        """
+        
+    def make_config_panel(self, lists):
+        #self.clear_widgets()
+        print(len(lists))
+        #GridLayout.__init__(self, cols=1, rows=len(lists))
+        #self.add_widget(ConfigPanel("aaa"))
+        #self.add_widget(ConfigPanel("bbb"))
+        for text in lists:
+            print(text)
+            self.add_widget(ConfigPanel(text))
+
         """
         , 
                             orientation = 'vertical',
@@ -369,8 +370,8 @@ class ShowWidget(Widget):
         graphpanel = self.ids.graph_view
         graphpanel.load_data()
 
-        #configpanel = self.ids.conpanel
-        #configpanel.make_config_panel(["tagai","hamada"])
+        configpanel = self.ids.conpanel
+        configpanel.make_config_panel(["tagai","hamada"])
 
     # Windowにドロップされた際発生するイベント
     # ファイル名を取得する
