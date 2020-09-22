@@ -41,7 +41,7 @@ class DataGraph:
 #-----------------------------------------------------------treemap---------------------------------------------------------
 #------------------treemap出力用------------------------　
     #引数:データフレームとタイトル
-    def print_treemap(self, df, title, fig, ax) :
+    def print_treemap(self, df, fig, ax) :
         #ソート
         df = self.rank_sort(df,False)
         #最大文字数検索
@@ -53,7 +53,6 @@ class DataGraph:
         style.use('ggplot')
         sns.set(font="IPAexGothic") #日本語フォント設定
 
-        #fig, ax = plt.subplots()
         # Colormap
         cmap = matplotlib.cm.Blues
 
@@ -74,12 +73,6 @@ class DataGraph:
         plt.axis('off')
         # y軸逆に
         plt.gca().invert_yaxis()
-        # タイトル、位置設定
-        plt.title(title, fontsize=32,fontweight="bold")
-        ttl = ax.title
-        ttl.set_position([.5, 1.05])
-        # 背景色
-        fig.set_facecolor('#eeffee')
 
 #-------------------割合作成後dfに追加----------------------
     def add_percent(self, df) :
@@ -329,8 +322,8 @@ class DataGraph:
 #---------------------棒グラフ出力用--------------------------
     def print_bar_graph_df(self, df, calamu, fig, ax):
         df = self.rank_sort(df,True)
-        plt.tight_layout()
-        plt.rcParams["font.size"] = 25
+        #plt.tight_layout()
+        #plt.rcParams["font.size"] = 25
         #plt.figure(figsize=(10,20 ), dpi=50,facecolor='#FFFFFF')
         plt.barh(df[calamu], df['point'])
         plt.grid(which='major',color='black',linestyle='-',axis = "x")
@@ -418,7 +411,13 @@ class DataGraph:
         if  flag == True:
             if len(colx) > 5:
             # 時間のラベルを5個に変更
-                plt.xticks(colx[0::(-(-len(colx)//5))])        
+                plt.xticks(colx[0::(-(-len(colx)//5))]) 
+        else :
+            ax.axis('off')
+            image_path ='nodata.png'
+            image = plt.imread(image_path) 
+            plt.imshow(image)
+            return False 
 
 
         #plt.show()
@@ -475,6 +474,12 @@ class DataGraph:
             if len(colx) > 5:
                 # 時間のラベルを5個に変更
                 plt.xticks(colx[::(-(-len(colx)//5))])
+        else :
+            ax.axis('off')
+            image_path ='nodata.png'
+            image = plt.imread(image_path) 
+            plt.imshow(image)
+            return False 
 
     def imscatter(self,x, y, image, ax=None, zoom=1): 
         if ax is None: 
@@ -495,9 +500,14 @@ class DataGraph:
         return artists 
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------表の作成---------------------------------------------------------
-    def print_table (self,df,endnum):
+    def print_table (self,df,endnum,fig,ax):
         if len(df) == 0:
-            return 0
+            ax.axis('off')
+            image_path ='nodata.png'
+            image = plt.imread(image_path)
+            image = np.asarray( image)
+            plt.imshow(image)
+            return False
         df = rank_sort(df,False)
         if endnum > len(df[df.columns[0]]):
             endnum = len(df[df.columns[0]])+1
@@ -507,8 +517,9 @@ class DataGraph:
         ax.axis('tight')
 
         tb = ax.table(cellText=df.values[:endnum],
+                       colWidths=[1,0.5],
                     colLabels=df.columns[:endnum],
-                    bbox=[0, 0, 1, 1],
+                    bbox=[0, 1-1/5*endnum, 1,1/5*endnum],
                     )
 
         tb[0, 0].set_facecolor('#363636')
@@ -528,13 +539,13 @@ class DataGraph:
         # plot用データ格納
         data =[]
 
-        plt.legend(loc="upper left", fontsize=18)
+        #plt.legend(loc="upper left", fontsize=18)
 
         if type(word) == str:
-            data = plt.plot(labels,df[word])
+            data = plt.plot(labels,df[word],marker="o")
         else:
             for i in word :
-                data = data + plt.plot(labels, df[i])
+                data = data + plt.plot(labels, df[i],marker="o")
         
         if len(labels) > 5:
             # 時間のラベルを5個飛ばしに変更
@@ -553,13 +564,6 @@ class DataGraph:
             tmp = tmp + [0]
 
         df_result = pd.DataFrame(index=[], columns = df.columns) 
-
-        for i in range(len(df)):
-            j = 0
-            for column in df.columns:
-                if  column != 'time':
-                    tmp[j] += df[column][i]
-                    j += 1
 
             if df['time'][i] > start:
                 i -=1
@@ -581,12 +585,41 @@ class DataGraph:
                     start = start - 6000 + 10000
                 if start >= 240000:
                     start = start - 240000 +1000000
+            else :
+                j = 0
+                for column in df.columns:
+                    if  column != 'time':
+                        tmp[j] += df[column][i]
+                        j += 1
         time = str(int((start%1000000)/10000)) + ':' +str(int((start%10000)/100))+':'+str(start%100)
         tmp.insert(0, time)
         df_2 = pd.DataFrame([tmp],columns=df_result.columns)
         df_result = pd.concat([df_result, df_2])
 
         return df_result
+#-----------------グラフ表示-----------------------------------
+
+    def first_graph(fig,ax,title,flag = True):
+        if flag == False:
+        plt.show()
+        return
+        # タイトル、位置設定
+        plt.title(title, fontsize=32,fontweight="bold")
+        ttl = ax.title
+        ttl.set_position([.5, 1.05])
+        plt.show()
+    
+#--------------------------------------------------------------
+#-----------------グラフ初期化-----------------------------------
+
+    def first_graph():
+        fig = plt.figure(figsize=(16, 9))
+        ax = fig.add_subplot(111)
+        # 背景色
+        fig.set_facecolor('#ffffff')
+        return fig,ax
+    
+#--------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------main-------------------------------------------------------------------
     def main_graph_test(self, df, fig, ax) :
@@ -648,6 +681,7 @@ class DataGraph:
         print("関数内DF表示")
         print(df)
         self.scr_case = scr_case
+        fig,ax = first_graph()
     #------------データ作成----------------
         #感情推定用df
         self.df_kanzyou = self.csv_df('kanzyou.csv')
@@ -673,7 +707,7 @@ class DataGraph:
 
     def switch_graph(self, fig, ax, graph_name = "treemap") :
     #--------------表示-----------------------
-        fig.delaxes()
+        flag = True
         if (graph_name == "treemap"):
             self.print_treemap(self.df_word_point,'treemap', fig, ax)
 
@@ -681,7 +715,7 @@ class DataGraph:
             self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
             
         elif (graph_name == "urltable"):
-            self.print_table(self.df_URL_point,5, fig, ax)
+            flag =　self.print_table(self.df_URL_point,5, fig, ax)
 
         elif (graph_name == "bargraph_contributor" and self.scr_case == False):
             self.print_bar_graph_df(self.df_contributor_point,'contributor', fig, ax)
@@ -699,7 +733,7 @@ class DataGraph:
             self.print_line_graph(self.df_time_negapozi,'negapozi',5, fig, ax)
 
         elif (graph_name == "df_time_www_point_100"):
-            self.print_www( self.df_time_www_point,100, fig, ax)
+            flag =　self.print_www( self.df_time_www_point,100, fig, ax)
 
         elif (graph_name == "df_time_hakusyu_point_100"):
-            self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)
+            flag =　self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)
