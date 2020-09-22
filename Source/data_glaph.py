@@ -104,13 +104,14 @@ class DataGraph:
         df_time_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のコメント数のｄｆ
         df_time_www_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のwww数のｄｆ
         df_time_hakusyu_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時の拍手数のｄｆ
-        df_URL = pd.DataFrame(index=[], columns=['URL'])#URLまとめdf
+        df_URL_point = pd.DataFrame(index=[], columns=['URL','point'])#URLまとめdf
         
         #print(df_word_point)
         for i in range(len(df)):
             url=self.URL_hanbetu(df['comment'][i])
             if url != False:
-                df_URL = df_URL.append({'URL':url}, ignore_index=True)
+                tmp = self.my_index(df_URL_point['URL'],url)
+                df_URL_point = self.make_df_append(df_URL_point,tmp,url)
             #print("記号削除前")
             #print(df_word_point)
             #記号削除中
@@ -124,29 +125,16 @@ class DataGraph:
             
             #時間ごとのコメント数計算
             tmp = self.my_index(df_time_point['time'],tmp_time)
-            if False !=tmp :
-                df_time_point['point'][tmp]+=1
-            else :
-                df_time_point = df_time_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
-            #wwwがあったら1追加なかったら0追加
+            df_time_point = self.make_df_append(df_time_point,tmp,tmp_time)
             print(url)
             if False != self.www_hanbetu(df['comment'][i]) and url == False:
-                print("!????")
-                print(url)
-            #if False != self.www_hanbetu(tmp_word):
-                if False !=tmp :
-                    df_time_www_point['point'][tmp]+=1
-                else :
-                    df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
+                df_time_www_point = self.make_df_append(df_time_www_point,tmp,tmp_time)
             else:
                 if False == tmp :
                     df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
             #拍手があったら1追加なかったら0追加
-            if False != self.hakusyu_hanbetu(df['comment'][i]):
-                if False !=tmp :
-                    df_time_hakusyu_point['point'][tmp]+=1
-                else :
-                    df_time_hakusyu_point = df_time_hakusyu_point.append({'time': tmp_time, 'point': 1}, ignore_index=True)
+             if False != self.hakusyu_hanbetu(df['comment'][i]):
+                df_time_hakusyu_point = self.make_df_append(df_time_hakusyu_point,tmp,tmp_time)
             else:
                 if False == tmp :
                     df_time_hakusyu_point = df_time_hakusyu_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
@@ -162,16 +150,19 @@ class DataGraph:
                     #名詞なら
                         if self.word_Classification(token.hinsi) == '名詞':    
                             tmp = self.my_index(df_word_point['word'],tmp_word)
-                            if False != tmp :
-                                df_word_point['point'][tmp] += 1
-                            else :
-                                df_word_point = df_word_point.append({'word':tmp_word,'point': 1}, ignore_index=True)
+                            df_word_point = self.make_df_append(df_word_point,tmp,tmp_word)
 
                         #名詞とその時の時間
                             df_time_word = df_time_word.append({'time':tmp_time,'word': tmp_word}, ignore_index=True)
 
-        return df_time_word,df_word_point,df_time_point,df_time_www_point,df_time_hakusyu_point,df_URL
-
+        return df_time_word,df_word_point,df_time_point,df_time_www_point, df_time_hakusyu_point,df_URL_point
+#---------------dfデータ追加プログラム-------------------
+    def make_df_append(self,df,index,data):
+        if False !=index :
+            df[df.columns[1]][index]+=1
+            return df
+        else :
+            return df.append({df.columns[0]: data, df.columns[1]: 1}, ignore_index=True)
 #---------------記号削除用プログラム-------------------
     def my_delete(self, string) :
         print(string)
@@ -374,32 +365,32 @@ class DataGraph:
 #-------------------------------------------get関数-------------------------------------------------
 
     # 単語（名詞）の数を取得
-    def get_word_num(self, df_word_point):
-        return len(df_word_point['word'])
+    def get_word_num(self):
+        return len(self.df_word_point['word'])
 
     # 単語（名詞）を全て取得
-    def get_all_word(self, df_word_point):
-        return df_word_point['word']
+    def get_all_word(self):
+        return self.df_word_point['word']
 
     # 投稿者数の取得
-    def get_contributor_num(self, df_contributor_point):
-        return len(df_contributor_point['contributor'])
+    def get_contributor_num(self):
+        return len(self.df_contributor_point['contributor'])
 
     # 投稿者名を全て取得
-    def get_all_contributor(self, df_contributor_point):
-        return df_contributor_point['contributor']
+    def get_all_contributor(self):
+        return self.df_contributor_point['contributor']
     
     # 最初・最後のコメント投稿時間の取得
-    def get_start_end_time(self, df_time_point):
-        return df_time_point[0],df_time_point[-1]
+    def get_start_end_time(self):
+        return self.df_time_point[0],self.df_time_point[-1]
     
     # コメント投稿時間を全て取得
-    def get_all_time(self, df_time_point):
-        return df_time_point['time']
+    def get_all_time(self):
+        return self.df_time_point['time']
     
     # 投稿されたURLを全て取得
     def get_all_URL(self):
-        return self.df_URL
+        return self.df_URL_point['URL']
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------散布図---------------------------------------------------------
 #----------------------------------wwwwww描画用-------------------------------------------
@@ -503,6 +494,29 @@ class DataGraph:
         ax.autoscale() 
         return artists 
 #--------------------------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------表の作成---------------------------------------------------------
+    def print_table (self,df,endnum):
+        if len(df) == 0:
+            return 0
+        df = rank_sort(df,False)
+        if endnum > len(df[df.columns[0]]):
+            endnum = len(df[df.columns[0]])+1
+        #fig, ax = plt.subplots(figsize=(2*len(df.columns),endnum))
+
+        ax.axis('off')
+        ax.axis('tight')
+
+        tb = ax.table(cellText=df.values[:endnum],
+                    colLabels=df.columns[:endnum],
+                    bbox=[0, 0, 1, 1],
+                    )
+
+        tb[0, 0].set_facecolor('#363636')
+        tb[0, 1].set_facecolor('#363636')
+        tb[0, 0].set_text_props(color='w')
+        tb[0, 1].set_text_props(color='w')
+#--------------------------------------------------------------------------------------------------------------------------------------
+
 #-----------------------------------------------------------折れ線グラフ---------------------------------------------------------
 
 #----------------------折れ線グラフ描画----------------------------------------------
@@ -640,7 +654,7 @@ class DataGraph:
         #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
 
         #コメントデータからデータ抽出＆データフレーム作成
-        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point,self.df_URL = self.string_word_point(df)
+        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point,self.df_URL_point = self.string_word_point(df)
         #人とその人のコメント数のdf作成
         if (scr_case == False):
             self.df_contributor_point = self.make_df_contributor_point(df)
@@ -659,11 +673,15 @@ class DataGraph:
 
     def switch_graph(self, fig, ax, graph_name = "treemap") :
     #--------------表示-----------------------
+        fig.delaxes()
         if (graph_name == "treemap"):
             self.print_treemap(self.df_word_point,'treemap', fig, ax)
 
         elif (graph_name == "bargraph_word"):
             self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
+            
+        elif (graph_name == "urltable"):
+            self.print_table(self.df_URL_point,5, fig, ax)
 
         elif (graph_name == "bargraph_contributor" and self.scr_case == False):
             self.print_bar_graph_df(self.df_contributor_point,'contributor', fig, ax)
