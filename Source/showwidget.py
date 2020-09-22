@@ -273,7 +273,7 @@ class GraphView(BoxLayout):
         print(funcname)
         if funcname == "func1":
             print("func1 play")
-            dataglp.switch_graph(self.fig, self.ax, "df_time_word_point_line_100")
+            dataglp.switch_graph(self.fig, self.ax, "単語出現数の推移", "df_time_word_point_line_100")
             #configpanel = self.ids.conpanel
             #print(configpanel)
             #configpanel = ConfigPanel()
@@ -281,21 +281,21 @@ class GraphView(BoxLayout):
             #ConfigPanel.make_words_list()
         elif funcname == "func2":
             print("func2 play")
-            dataglp.switch_graph(self.fig, self.ax, "treemap")
+            dataglp.switch_graph(self.fig, self.ax, "ホットワード", "treemap")
         elif funcname == "func3":
             print("func3 play")
-            dataglp.switch_graph(self.fig, self.ax, "bargraph_contributor")
+            dataglp.switch_graph(self.fig, self.ax, "コメントの多い投稿者", "bargraph_contributor")
         elif funcname == "func4":
             print("func4 play")
-            dataglp.switch_graph(self.fig, self.ax,"df_time_www_point_100")
+            dataglp.switch_graph(self.fig, self.ax, "笑いの推移", "df_time_www_point_100")
         elif funcname == "func5":
             print("func5 play")
-            dataglp.switch_graph(self.fig, self.ax, "df_time_hakusyu_point_100")
+            dataglp.switch_graph(self.fig, self.ax, "拍手の推移", "df_time_hakusyu_point_100")
         elif funcname == "func6":
             print("func5 play")
             print(dataglp.get_all_URL())
         elif funcname == "func7":
-            dataglp.switch_graph(self.fig, self.ax, "urltable")
+            dataglp.switch_graph(self.fig, self.ax, "参照URLランキング", "urltable")
 
 
 
