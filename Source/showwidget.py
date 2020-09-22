@@ -62,23 +62,39 @@ loadfilepath = ""
 
 df = pd.DataFrame()
 
-class SubGrids(GridLayout): 
+class SubGrids(BoxLayout):
+    """チェックボックスとラベルでできたウィジェットを追加"""
+    """init時にラベル名を引数として与える"""
     def __init__(self, word, **kwargs):
         super().__init__(**kwargs)
-        GridLayout.__init__(self, cols=2)
+        #GridLayout.__init__(self, cols=2, raws=1)
         self.add_widget(CheckBox(size_hint_x=None, width=75))
         self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+        
 
-class ConfigPanel(GridLayout): 
-    def __init__(self, **kwargs): 
+class ConfigPanel(GridLayout):
+    def __init__(self, word, **kwargs): 
         super().__init__(**kwargs)
+        # test用　データがなくても表示されるよ
+        GridLayout.__init__(self, cols=1, rows=3)
+        self.add_widget(SubGrids(word="aaa"))
+        self.add_widget(SubGrids(word="bbb"))
+        self.add_widget(SubGrids(word="ccc"))
+        #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+        #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+        #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+        
     # Widget追加時にword抽出をする
-    def make_words_list(self, word):
+    #def make_words_list(self, word):
         try:
             word_df = dataglp.get_all_word()
         except:
             print("ファイルが読み込まれていません")
         else:
+            print("ファイルが読み込まれました")
+            self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+            
+            """
             self.clear_widgets()
             #self.add_widget(Label(text="単語一覧", color=[0.23,0.23,0.23,1]))
             self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
@@ -86,17 +102,35 @@ class ConfigPanel(GridLayout):
             for _, str_word in (dataglp.get_all_word()).iteritems():
                 print(str_word)
                 self.add_widget(SubGrids(str_word))
+            """
         pass
 
 
-class Panels(BoxLayout):
+class Panels(GridLayout):
     """詳細設定をするためのウィジェット"""
     def __init__(self, **kwargs): 
         super().__init__(**kwargs)
-    
-    def make_config_panel(self, lists):
-        self.clear_widgets()
-        BoxLayout.__init__(self)
+        lists = ["tagai","hamada"]
+        GridLayout.__init__(self, cols=1, rows=3)
+        #GridLayout.__init__(self, cols=1, rows=len(lists))
+        # 縦に分割してラベルを表示できるようにはなった
+        #self.add_widget(Label(text= lists[0]))
+        #self.add_widget(Label(text= lists[0]))
+        #self.add_widget(Label(text= lists[1]))
+
+        # 縦に（チェックボックス , ラベル）の塊を表示したい
+        self.add_widget(ConfigPanel("aaa"))
+        self.add_widget(ConfigPanel("bbb"))
+        self.add_widget(ConfigPanel("ccc"))
+        #self.add_widget(ConfigPanel("ddd"))
+        """
+        def make_config_panel(self, lists):
+            #self.clear_widgets()
+            print(len(lists))
+            #GridLayout.__init__(self, cols=1, rows=len(lists))
+            self.add_widget(ConfigPanel("aaa"))
+            self.add_widget(ConfigPanel("bbb"))
+        """
         """
         , 
                             orientation = 'vertical',
@@ -136,7 +170,7 @@ class Panels(BoxLayout):
             source: './Source/image/line.png'
         """
         #confpanel = self.ids.conpanel
-        confpanel = ConfigPanel()
+        #confpanel = ConfigPanel()
         #self.add_widget(confpanel.make_words_list("aaa"))
         #for text in lists:
         #    print(text)
@@ -335,8 +369,8 @@ class ShowWidget(Widget):
         graphpanel = self.ids.graph_view
         graphpanel.load_data()
 
-        configpanel = self.ids.conpanel
-        configpanel.make_config_panel(["tagai","hamada"])
+        #configpanel = self.ids.conpanel
+        #configpanel.make_config_panel(["tagai","hamada"])
 
     # Windowにドロップされた際発生するイベント
     # ファイル名を取得する

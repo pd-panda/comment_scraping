@@ -353,8 +353,14 @@
                                 valign: 'middle'
                                 text_size: self.size
                     Panels:
+                        size_hint_x: 0.5
+                        size_hint_y: None
+                        #pos_hint: {"x":0, "top":1}
+                        height: self.parent.height
+                        padding: [10, 30]
+                        spacing: [20, 50]
                         id: conpanel
-                    
+
 <GraphView>:
 
 <ConfigPanel>:
@@ -362,3 +368,12 @@
 <SubGrids>:
 
 <Panels>:
+
+<GridLayout>:
+    #canvas.before:
+    #    BorderImage:
+            # BorderImage behaves like the CSS BorderImage
+    #        border: 10, 10, 10, 10
+    #        source: './Source/image/commentpanel.png'
+    #        pos: self.pos
+    #        size: self.size

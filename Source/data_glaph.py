@@ -133,7 +133,7 @@ class DataGraph:
                 if False == tmp :
                     df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
             #拍手があったら1追加なかったら0追加
-             if False != self.hakusyu_hanbetu(df['comment'][i]):
+            if False != self.hakusyu_hanbetu(df['comment'][i]):
                 df_time_hakusyu_point = self.make_df_append(df_time_hakusyu_point,tmp,tmp_time)
             else:
                 if False == tmp :
@@ -495,10 +495,10 @@ class DataGraph:
         return artists 
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------表の作成---------------------------------------------------------
-    def print_table (self,df,endnum):
+    def print_table (self,df,endnum,fig,ax):
         if len(df) == 0:
             return 0
-        df = rank_sort(df,False)
+        df = self.rank_sort(df,False)
         if endnum > len(df[df.columns[0]]):
             endnum = len(df[df.columns[0]])+1
         #fig, ax = plt.subplots(figsize=(2*len(df.columns),endnum))
@@ -673,7 +673,6 @@ class DataGraph:
 
     def switch_graph(self, fig, ax, graph_name = "treemap") :
     #--------------表示-----------------------
-        fig.delaxes()
         if (graph_name == "treemap"):
             self.print_treemap(self.df_word_point,'treemap', fig, ax)
 
