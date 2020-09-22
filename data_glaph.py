@@ -49,6 +49,7 @@ class DataGraph:
 #------------------treemap出力用------------------------　
     #引数:データフレームとタイトル
     def print_treemap(self, df, title, fig, ax) :
+        
         #ソート
         df = self.rank_sort(df,False)
         #最大文字数検索
@@ -678,6 +679,7 @@ def print_table (self,df,endnum):
 
     def switch_graph(self, fig, ax, graph_name = "treemap") :
     #--------------表示-----------------------
+        fig.delaxes()
         if (graph_name == "treemap"):
             self.print_treemap(self.df_word_point,'treemap', fig, ax)
 
