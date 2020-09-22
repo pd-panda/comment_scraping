@@ -15,6 +15,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout 
 from kivy.uix.label import Label 
+from kivy.uix.checkbox import CheckBox
 
 # kivy.unix.popupクラスを使ってPopUpを生成する
 from kivy.uix.popup import Popup
@@ -60,6 +61,87 @@ savefilepath = os.path.join(savefiledir, savefilename)
 loadfilepath = ""
 
 df = pd.DataFrame()
+
+class SubGrids(GridLayout): 
+    def __init__(self, word, **kwargs):
+        super().__init__(**kwargs)
+        GridLayout.__init__(self, cols=2)
+        self.add_widget(CheckBox(size_hint_x=None, width=75))
+        self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+
+class ConfigPanel(GridLayout): 
+    def __init__(self, **kwargs): 
+        super().__init__(**kwargs)
+    # Widget追加時にword抽出をする
+    def make_words_list(self, word):
+        try:
+            word_df = dataglp.get_all_word()
+        except:
+            print("ファイルが読み込まれていません")
+        else:
+            self.clear_widgets()
+            #self.add_widget(Label(text="単語一覧", color=[0.23,0.23,0.23,1]))
+            self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+            GridLayout.__init__(self, cols=2, rows=-(-len(word_df)//2))
+            for _, str_word in (dataglp.get_all_word()).iteritems():
+                print(str_word)
+                self.add_widget(SubGrids(str_word))
+        pass
+
+
+class Panels(BoxLayout):
+    """詳細設定をするためのウィジェット"""
+    def __init__(self, **kwargs): 
+        super().__init__(**kwargs)
+    
+    def make_config_panel(self, lists):
+        self.clear_widgets()
+        BoxLayout.__init__(self)
+        """
+        , 
+                            orientation = 'vertical',
+                            size_hint_y = None,
+                            pos_hint    = {"x":0, "top":1},
+                            height      = self.parent.height,
+                            size_hint_x = 0.5,
+                            padding     = [10, 30],
+                            spacing     = [20, 50],
+        """
+        #with self.canvas:
+            #Color(0, 1, 1, 1)
+        #    self.rect = Rectangle(source="./Source/image/commentpanel.png", size=self.size, pos=self.pos)
+            #self.rect = Rectangle(source="back.jpg", size=root.size, pos=root.pos)
+        #self.add_widget()
+        """
+        canvas.before: 
+            Rectangle: 
+                pos: self.pos 
+                size: self.size 
+                source: './Source/image/commentpanel.png'
+                Label:
+        text: "コメント数"
+            color: [0.23,0.23,0.23,1]
+            font_size: 32
+            halign: 'center'
+            valign: 'middle'
+            height: 30
+            size_hint_y: None
+            #size_hint_y: 0.1
+        Image:
+            #size: self.size
+            height: 20
+            size_hint_y: None
+            #size_hint_y: 0.1
+            keep_ratio: True
+            source: './Source/image/line.png'
+        """
+        #confpanel = self.ids.conpanel
+        confpanel = ConfigPanel()
+        #self.add_widget(confpanel.make_words_list("aaa"))
+        #for text in lists:
+        #    print(text)
+        #    self.add_widget(confpanel.make_words_list(text))
+
 #check = BooleanProperty(True)
 class GraphView(BoxLayout):
     """Matplotlib のグラフを表示するためのウィジェット"""
@@ -158,6 +240,11 @@ class GraphView(BoxLayout):
         if funcname == "func1":
             print("func1 play")
             dataglp.switch_graph(self.fig, self.ax, "df_time_word_point_line_100")
+            #configpanel = self.ids.conpanel
+            #print(configpanel)
+            #configpanel = ConfigPanel()
+            #configpanel.make_words_list()
+            #ConfigPanel.make_words_list()
         elif funcname == "func2":
             print("func2 play")
             dataglp.switch_graph(self.fig, self.ax, "treemap")
@@ -173,30 +260,10 @@ class GraphView(BoxLayout):
         elif funcname == "func6":
             print("func5 play")
             print(dataglp.get_all_URL())
+        elif funcname == "func7":
+            dataglp.switch_graph(self.fig, self.ax, "urltable")
 
-class SubGrids(GridLayout): 
-    def __init__(self, **kwargs): 
-        GridLayout.__init__(self, cols=3, rows=3); 
-        self.add_widget(Label(text='1st')); 
-        self.add_widget(Label(text='')); 
-        self.add_widget(Label(text='2nd')); 
-        self.add_widget(Label(text='')); 
-        self.add_widget(Label(text='3rd')); 
-        self.add_widget(Label(text='')); 
-        self.add_widget(Label(text='4th')); 
-        self.add_widget(Label(text='')); 
-        self.add_widget(Label(text='5th')); 
 
-class Grids(GridLayout): 
-    def __init__(self, **kwargs): 
-        pass
-        GridLayout.__init__(self, cols=2, rows = 2); 
-        self.add_widget(SubGrids()); 
-        self.add_widget(SubGrids()); 
-        self.add_widget(SubGrids()); 
-        self.add_widget(SubGrids()); 
-
-#glp = GraphView()
 
 class ShowWidget(Widget):
     
@@ -262,6 +329,14 @@ class ShowWidget(Widget):
 
     def plottest(self):
         glp.main()
+
+    def conpanel(self):
+        print("conpanel press")
+        graphpanel = self.ids.graph_view
+        graphpanel.load_data()
+
+        configpanel = self.ids.conpanel
+        configpanel.make_config_panel(["tagai","hamada"])
 
     # Windowにドロップされた際発生するイベント
     # ファイル名を取得する
