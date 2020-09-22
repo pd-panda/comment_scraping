@@ -526,6 +526,7 @@ class DataGraph:
         tb[0, 1].set_facecolor('#363636')
         tb[0, 0].set_text_props(color='w')
         tb[0, 1].set_text_props(color='w')
+        return True
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------折れ線グラフ---------------------------------------------------------
@@ -564,7 +565,7 @@ class DataGraph:
             tmp = tmp + [0]
 
         df_result = pd.DataFrame(index=[], columns = df.columns) 
-
+        for i in range(len(df)):
             if df['time'][i] > start:
                 i -=1
                 time = str(int((start%1000000)/10000)) + ':' +str(int((start%10000)/100))+':'+str(start%100)
@@ -598,22 +599,19 @@ class DataGraph:
 
         return df_result
 #-----------------グラフ表示-----------------------------------
-
-    def first_graph(fig,ax,title,flag = True):
-        if flag == False:
-        plt.show()
-        return
-        # タイトル、位置設定
-        plt.title(title, fontsize=32,fontweight="bold")
-        ttl = ax.title
-        ttl.set_position([.5, 1.05])
-        plt.show()
+    def setting_graph(self, fig, ax, title, flag = True):
+        """ debug用 """
+        if flag == True:
+            # タイトルの設定（名前、位置）
+            plt.title(title, fontsize=32,fontweight="bold")
+            ttl = ax.title
+            ttl.set_position([.5, 1.05])
     
 #--------------------------------------------------------------
 #-----------------グラフ初期化-----------------------------------
 
-    def first_graph():
-        fig = plt.figure(figsize=(16, 9))
+    def first_graph(self, fig, ax):
+        #fig = plt.figure(figsize=(16, 9))
         ax = fig.add_subplot(111)
         # 背景色
         fig.set_facecolor('#ffffff')
@@ -681,7 +679,7 @@ class DataGraph:
         print("関数内DF表示")
         print(df)
         self.scr_case = scr_case
-        fig,ax = first_graph()
+        #fig,ax = self.first_graph()
     #------------データ作成----------------
         #感情推定用df
         self.df_kanzyou = self.csv_df('kanzyou.csv')
@@ -705,18 +703,18 @@ class DataGraph:
         
         self.rank_word  = self.make_rank_word(5,self.df_word_point,'word')
 
-    def switch_graph(self, fig, ax, graph_name = "treemap") :
-    #--------------表示-----------------------
+    def switch_graph(self, fig, ax, title, graph_name = "treemap") :
+    
         flag = True
-
+    #--------------表示-----------------------
         if (graph_name == "treemap"):
-            self.print_treemap(self.df_word_point,'treemap', fig, ax)
+            self.print_treemap(self.df_word_point, fig, ax)
 
         elif (graph_name == "bargraph_word"):
             self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
             
         elif (graph_name == "urltable"):
-            flag =　self.print_table(self.df_URL_point,5, fig, ax)
+            flag = self.print_table(self.df_URL_point,5, fig, ax)
 
         elif (graph_name == "bargraph_contributor" and self.scr_case == False):
             self.print_bar_graph_df(self.df_contributor_point,'contributor', fig, ax)
@@ -734,7 +732,9 @@ class DataGraph:
             self.print_line_graph(self.df_time_negapozi,'negapozi',5, fig, ax)
 
         elif (graph_name == "df_time_www_point_100"):
-            flag =　self.print_www( self.df_time_www_point,100, fig, ax)
+            flag = self.print_www( self.df_time_www_point,100, fig, ax)
 
         elif (graph_name == "df_time_hakusyu_point_100"):
-            flag =　self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)
+            flag = self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)
+        
+        self.setting_graph(fig, ax, title, flag)
