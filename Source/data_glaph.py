@@ -89,7 +89,7 @@ class DataGraph:
 #-----------------------------------------------------------構文解析&データ作成---------------------------------------------------------
 
 #------------コメントデータからデータ抽出＆データフレーム作成--------------
-    def string_word_point(self, df):
+    def string_word_point(self, df,df_kanzyou):
         jumanpp = Juman(jumanpp=False)
         tmp_word =[]
         df_time_word = pd.DataFrame(index=[], columns=['time','word']) #単語と時間のｄｆ
@@ -98,9 +98,15 @@ class DataGraph:
         df_time_www_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のwww数のｄｆ
         df_time_hakusyu_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時の拍手数のｄｆ
         df_URL_point = pd.DataFrame(index=[], columns=['URL','point'])#URLまとめdf
+        df_time_positive_negative = pd.DataFrame(index=[], columns=['time','positive','negative','nil'])#ネガポジdf
+
         
         #print(df_word_point)
         for i in range(len(df)):
+            p=0
+            n=0
+            nil =0
+            #URLだったら追加
             url=self.URL_hanbetu(df['comment'][i])
             if url != False:
                 tmp = self.my_index(df_URL_point['URL'],url)
@@ -120,6 +126,7 @@ class DataGraph:
             tmp = self.my_index(df_time_point['time'],tmp_time)
             df_time_point = self.make_df_append(df_time_point,tmp,tmp_time)
             print(url)
+            #wwwがあったら1追加なかったら0追加
             if False != self.www_hanbetu(df['comment'][i]) and url == False:
                 df_time_www_point = self.make_df_append(df_time_www_point,tmp,tmp_time)
             else:
@@ -144,11 +151,27 @@ class DataGraph:
                         if self.word_Classification(token.hinsi) == '名詞':    
                             tmp = self.my_index(df_word_point['word'],tmp_word)
                             df_word_point = self.make_df_append(df_word_point,tmp,tmp_word)
-
+                            
                         #名詞とその時の時間
                             df_time_word = df_time_word.append({'time':tmp_time,'word': tmp_word}, ignore_index=True)
+                            
+                            #ネガポジ判断
+                            tmp = self.negapozi_hanbetu(tmp_word,df_kanzyou)
+                            if tmp == 'p':
+                                p +=1
+                            elif tmp == 'n':
+                                n +=1
+                            elif tmp == 'nil':
+                                nil +=1
+                index = self.my_index(df_time_positive_negative['time'],tmp_time)
+                if False !=index :
+                    df_time_positive_negative['positive'][index]+= p
+                    df_time_positive_negative['negative'][index]+= n
+                    df_time_positive_negative['nil'][index]+= nil
+                else :
+                    df_time_positive_negative = df_time_positive_negative.append({'time': tmp_time, 'positive': p,'negative': n,'nil':nil}, ignore_index=True)
 
-        return df_time_word,df_word_point,df_time_point,df_time_www_point, df_time_hakusyu_point,df_URL_point
+        return df_time_word,df_word_point,df_time_point,df_time_www_point, df_time_hakusyu_point,df_URL_point,df_time_positive_negative
 #---------------dfデータ追加プログラム-------------------
     def make_df_append(self,df,index,data):
         if False !=index :
@@ -204,7 +227,7 @@ class DataGraph:
                     return False
             return True
         else:return False 
-#----------------URL判別用プログラム--------------------------
+#----------------URL判別用プログラム----------------
     def URL_hanbetu(self,string):
         parsed_url = urlparse(string)
         if 'h' in parsed_url.scheme:
@@ -212,6 +235,16 @@ class DataGraph:
         else : url = False
     
         return url 
+#----------------ネガポジ判断----------------
+    def negapozi_hanbetu(word,df_kanzyou) :
+        tmp = my_index(df_kanzyou['word'],word)
+
+        if tmp != False:
+            if  'p' in df_kanzyou['negapozi'][tmp]
+                return 'p'
+            if  'n' in df_kanzyou['negapozi'][tmp]:
+                return 'n'
+            return 'nil'   
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 #------------------------いろんなdf作成------------------------------------------------------
@@ -231,49 +264,41 @@ class DataGraph:
 #========================データ作成(折れ線グラフ)=================================
 #------------------各時間の単語ごとの出現数のdf作成---------------------------
     def time_word_point(self, df_time_word,df_word_point,df_time_point) :
-        df_time_word_point_stack = pd.DataFrame(index=[])
-        df_time_word_point_line = pd.DataFrame(index=[])
-        df_time_word_point_stack['time'] = df_time_point['time']
-        df_time_word_point_line['time'] = df_time_point['time']
+        df_time_word_point = pd.DataFrame(index=[])
+        df_time_word_point['time'] = df_time_point['time']
 
         word = df_word_point['word']
 
         for row in word:
-            df_time_word_point_stack[row] = 0
-            df_time_word_point_line[row] = 0
+            df_time_word_point[row] = 0
             #特定の単語の配列番号取得
             tmp_list = [i for i, x in enumerate(df_time_word['word'] == row) if x == True]
-        
             for i in tmp_list:
-                tmp = df_time_word_point_stack['time'].values.tolist().index(df_time_word['time'][i])
-                df_time_word_point_stack[row][tmp:] +=1
-                df_time_word_point_line[row][tmp] +=1
+                tmp = df_time_word_point['time'].values.tolist().index(df_time_word['time'][i])
+                df_time_word_point[row][tmp] +=1
 
-        return df_time_word_point_stack,df_time_word_point_line
+        return df_time_word_point
 
 #---------------各時間の人ごとの出現数のdf作成-----------------------------------
     def time_contributor_point(self, df,df_time_point,df_contributor_point) :
-        df_time_contributor_point_stack = pd.DataFrame(index=[])
-        df_time_contributor_point_line = pd.DataFrame(index=[])
-        df_time_contributor_point_stack['time'] = df_time_point['time']
-        df_time_contributor_point_line['time'] = df_time_point['time']
+        df_time_contributor_point = pd.DataFrame(index=[])
+        df_time_contributor_point'time'] = df_time_point['time']
+
 
         contributor = df_contributor_point['contributor']
 
         #print(df_time_contributor_point_stack['time'])
 
         for row in contributor:
-            df_time_contributor_point_stack[row] = 0
-            df_time_contributor_point_line[row] = 0
+            df_time_contributor_point[row] = 0
             #特定の単語の配列番号取得
             tmp_list = [i for i, x in enumerate(df['contributor'] == row) if x == True]
         
             for i in tmp_list:
                 tmp = df_time_contributor_point_stack['time'].values.tolist().index(self.strtime_to_inttime(df['time'][i]))
-                df_time_contributor_point_stack[row][tmp:] +=1
-                df_time_contributor_point_line[row][tmp] +=1
+                df_time_contributor_point[row][tmp] +=1
 
-        return df_time_contributor_point_stack,df_time_contributor_point_line
+        return df_time_contributor_point
 #====================================================================================================
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------自作関数(便利用)-------------------------------------------------
@@ -329,31 +354,6 @@ class DataGraph:
         plt.grid(which='major',color='black',linestyle='-',axis = "x")
         #plt.show()
 
-#--------------------------------------------------------------------------------------------------------------------------------------
-#--------------------------------------感情推定----------------------------------------
-
-#----------各時間でのネガティブかポジティブかをdfに-------------------------
-    def make_df_time_negapozi(self, df_time_word,df_time_point,df_kanzyou):
-        df_time_negapozi = pd.DataFrame(index=[])
-        df_time_negapozi['time'] = df_time_point['time']
-        df_time_negapozi['negapozi'] = 0
-        c=0
-        for i in range(len(df_time_negapozi)):
-        
-            while df_time_negapozi['time'][i] == df_time_word['time'][c]:
-                tmp = self.my_index(df_kanzyou['word'],df_time_word['word'][c])
-                if tmp == False:
-                    df_time_negapozi['negapozi'][i:] += 0
-                else:
-                    if  'p' in df_kanzyou['negapozi'][tmp]:
-                        df_time_negapozi['negapozi'][i:] += 1
-                    if  'n' in df_kanzyou['negapozi'][tmp]:
-                        df_time_negapozi['negapozi'][i:] -= 1   
-                c+=1
-                if c >= len(df_time_word) :
-                     return df_time_negapozi
-    
-        return df_time_negapozi
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------get関数-------------------------------------------------
 
@@ -528,12 +528,30 @@ class DataGraph:
         tb[0, 1].set_text_props(color='w')
         return True
 #--------------------------------------------------------------------------------------------------------------------------------------
-
+#-----------------------------------------------------------円グラフ---------------------------------------------------------
+    def print_pie_graph(self,df,word,fig,ax,flag = 'negapozi'):
+        label = []
+        data =[]
+        for i in word :
+            if flag == 'negapozi':
+                data = data + [df[i].sum()]
+                label += [i]
+            else :
+                index = my_index(df[df.columns[0]],i)
+                if index != False:
+                    data = data + [df['point'][index]]
+                    label += [i]
+        plt.pie(data, labels=label,autopct="%1.1f%%")
 #-----------------------------------------------------------折れ線グラフ---------------------------------------------------------
 
 #----------------------折れ線グラフ描画----------------------------------------------
-    def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line'):
+    def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line',flag2 = True):
         df = self.df_time__(df,cutnum,flag)
+         j=0
+        if flag2 != True:
+            flatui = ["#ed7d31", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
+            current_palette =sns.color_palette(flatui, 24)
+        else : current_palette = sns.color_palette(n_colors=24)
 
         # ラベルとして表示するtimeを格納
         labels = df[df.columns[0]]
@@ -546,7 +564,11 @@ class DataGraph:
             data = plt.plot(labels,df[word],marker="o")
         else:
             for i in word :
-                data = data + plt.plot(labels, df[i],marker="o")
+                if flag2 != True and j == 2:
+                    data = data + plt.plot(left, df[i],marker="o",color=current_palette[j],linestyle='dashdot',linewidth = 3.0)
+           
+                else :data = data + plt.plot(left, df[i],marker="o",color=current_palette[j],linewidth = 3.0)
+                j+=1
         
         if len(labels) > 5:
             # 時間のラベルを5個飛ばしに変更
@@ -569,10 +591,7 @@ class DataGraph:
             j = 0
             if df['time'][i] < start :
                 for column in df.columns[1:]:
-                    if flag == 'line':
-                        tmp[j] += df[column][i]
-                    else :
-                        tmp[j] = df[column][i]
+                    tmp[j] += df[column][i]
                     j += 1
                 i += 1
                 if i > len(df['time'])-1:break
@@ -693,18 +712,16 @@ class DataGraph:
         #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
 
         #コメントデータからデータ抽出＆データフレーム作成
-        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point,self.df_URL_point = self.string_word_point(df)
+        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point,self.df_URL_point,self.df_time_positive_negative = self.string_word_point(df,df_kanzyou)
         #人とその人のコメント数のdf作成
         if (scr_case == False):
             self.df_contributor_point = self.make_df_contributor_point(df)
 
-        #各時間でのネガティブかポジティブかをdfに
-        self.df_time_negapozi = self.make_df_time_negapozi(self.df_time_word,self.df_time_point,self.df_kanzyou)
         #各時間の単語ごとの出現数のdf作成
-        self.df_time_word_point_stack,self.df_time_word_point_line = self.time_word_point(self.df_time_word,self.df_word_point,self.df_time_point)
+        self.df_time_word_point = self.time_word_point(self.df_time_word,self.df_word_point,self.df_time_point)
         if (scr_case == False):
             #各時間の人ごとの出現数のdf作成
-            self.df_time_contributor_point_stack,self.df_time_contributor_point_line = self.time_contributor_point(df,self.df_time_point,self.df_contributor_point)
+            self.df_time_contributor_point= self.time_contributor_point(df,self.df_time_point,self.df_contributor_point)
         #------------------保存変数-----------------------------------
             self.rank_contributor = self.make_rank_word(2,self.df_contributor_point,'contributor')
         
