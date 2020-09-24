@@ -106,11 +106,13 @@ class DataGraph:
             p=0
             n=0
             nil =0
+            
             #URLだったら追加
             url=self.URL_hanbetu(df['comment'][i])
             if url != False:
                 tmp = self.my_index(df_URL_point['URL'],url)
                 df_URL_point = self.make_df_append(df_URL_point,tmp,url)
+            
             #print("記号削除前")
             #print(df_word_point)
             #記号削除中
@@ -125,7 +127,7 @@ class DataGraph:
             #時間ごとのコメント数計算
             tmp = self.my_index(df_time_point['time'],tmp_time)
             df_time_point = self.make_df_append(df_time_point,tmp,tmp_time)
-            print(url)
+            #print(url)
             #wwwがあったら1追加なかったら0追加
             if False != self.www_hanbetu(df['comment'][i]) and url == False:
                 df_time_www_point = self.make_df_append(df_time_www_point,tmp,tmp_time)
@@ -144,7 +146,7 @@ class DataGraph:
                 #print(result)
                 #分析結果からdf作成
                 for token in result.mrph_list():
-                    tmp_word = token.midasi   
+                    tmp_word = token.midasi
                 #名詞の出現数計算
                     if 0 != self.word_Classification(token.hinsi):
                     #名詞なら
@@ -236,13 +238,13 @@ class DataGraph:
     
         return url 
 #----------------ネガポジ判断----------------
-    def negapozi_hanbetu(word,df_kanzyou) :
-        tmp = my_index(df_kanzyou['word'],word)
+    def negapozi_hanbetu(self,word,df_kanzyou) :
+        tmp = self.my_index(df_kanzyou['word'],word)
 
         if tmp != False:
-            if  'p' in df_kanzyou['negapozi'][tmp]
+            if 'p' in df_kanzyou['negapozi'][tmp]:
                 return 'p'
-            if  'n' in df_kanzyou['negapozi'][tmp]:
+            if 'n' in df_kanzyou['negapozi'][tmp]:
                 return 'n'
             return 'nil'   
 
@@ -282,7 +284,7 @@ class DataGraph:
 #---------------各時間の人ごとの出現数のdf作成-----------------------------------
     def time_contributor_point(self, df,df_time_point,df_contributor_point) :
         df_time_contributor_point = pd.DataFrame(index=[])
-        df_time_contributor_point'time'] = df_time_point['time']
+        df_time_contributor_point['time'] = df_time_point['time']
 
 
         contributor = df_contributor_point['contributor']
@@ -295,7 +297,7 @@ class DataGraph:
             tmp_list = [i for i, x in enumerate(df['contributor'] == row) if x == True]
         
             for i in tmp_list:
-                tmp = df_time_contributor_point_stack['time'].values.tolist().index(self.strtime_to_inttime(df['time'][i]))
+                tmp = df_time_contributor_point['time'].values.tolist().index(self.strtime_to_inttime(df['time'][i]))
                 df_time_contributor_point[row][tmp] +=1
 
         return df_time_contributor_point
@@ -547,7 +549,7 @@ class DataGraph:
 #----------------------折れ線グラフ描画----------------------------------------------
     def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line',flag2 = True):
         df = self.df_time__(df,cutnum,flag)
-         j=0
+        j=0
         if flag2 != True:
             flatui = ["#ed7d31", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
             current_palette =sns.color_palette(flatui, 24)
@@ -565,9 +567,9 @@ class DataGraph:
         else:
             for i in word :
                 if flag2 != True and j == 2:
-                    data = data + plt.plot(left, df[i],marker="o",color=current_palette[j],linestyle='dashdot',linewidth = 3.0)
+                    data = data + plt.plot(labels, df[i],marker="o",color=current_palette[j],linestyle='dashdot',linewidth = 3.0)
            
-                else :data = data + plt.plot(left, df[i],marker="o",color=current_palette[j],linewidth = 3.0)
+                else :data = data + plt.plot(labels, df[i],marker="o",color=current_palette[j],linewidth = 3.0)
                 j+=1
         
         if len(labels) > 5:
@@ -585,7 +587,7 @@ class DataGraph:
         tmp = []
         for i in range(len(df.columns)-1):
             tmp = tmp + [0]
-         i=0
+        i=0
         df_result = pd.DataFrame(index=[], columns = df.columns) 
         while df['time'].iloc[-1] >= start:
             j = 0
@@ -638,6 +640,7 @@ class DataGraph:
 
     def first_graph(self, fig, ax):
         #fig = plt.figure(figsize=(16, 9))
+        ax.axis('off')
         ax = fig.add_subplot(111)
         # 背景色
         fig.set_facecolor('#ffffff')
@@ -712,7 +715,7 @@ class DataGraph:
         #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
 
         #コメントデータからデータ抽出＆データフレーム作成
-        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point,self.df_URL_point,self.df_time_positive_negative = self.string_word_point(df,df_kanzyou)
+        self.df_time_word,self.df_word_point,self.df_time_point,self.df_time_www_point,self.df_time_hakusyu_point,self.df_URL_point,self.df_time_positive_negative = self.string_word_point(df,self.df_kanzyou)
         #人とその人のコメント数のdf作成
         if (scr_case == False):
             self.df_contributor_point = self.make_df_contributor_point(df)
@@ -744,13 +747,13 @@ class DataGraph:
             self.print_bar_graph_df(self.df_contributor_point,'contributor', fig, ax)
 
         elif (graph_name == "df_time_word_point_line_100"):
-            self.print_line_graph(self.df_time_word_point_line,self.rank_word,100,fig, ax)
+            self.print_line_graph(self.df_time_word_point,self.rank_word,100,fig, ax)
 
         elif (graph_name == "df_time_word_point_line_5" and self.scr_case == False):
-            self.print_line_graph(self.df_time_contributor_point_line,self.rank_contributor,5,fig, ax)
+            self.print_line_graph(self.df_time_contributor_point,self.rank_contributor,5,fig, ax)
 
         elif (graph_name == "df_time_word_point_stack_5" and self.scr_case == False):
-            self.print_line_graph(self.df_time_contributor_point_stack,self.rank_contributor,5, fig, ax, 'stack')
+            self.print_line_graph(self.df_time_contributor_point,self.rank_contributor,5, fig, ax, 'stack')
 
         elif (graph_name == "df_time_negapozi_5"):
             self.print_line_graph(self.df_time_negapozi,'negapozi',5, fig, ax)
