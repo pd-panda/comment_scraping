@@ -13,7 +13,8 @@ from kivy.core.window import Window
 from kivy.resources import resource_add_path
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout 
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label 
 from kivy.uix.checkbox import CheckBox
 
@@ -203,6 +204,25 @@ class GraphView(BoxLayout):
             print("func7 play")
             dataglp.switch_graph(self.fig, self.ax, "参照URLランキング", "urltable")
 
+class PopupChooseFile(BoxLayout):
+ 
+    # 現在のカレントディレクトリ。FileChooserIconViewのpathに渡す
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+ 
+    # MusicPlayerクラス内で参照するための設定
+    select = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+
+class LoadDialog(FloatLayout):
+    """ファイルをロードするダイアグラム"""
+    load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+
+class SaveDialog(FloatLayout):
+    """ファイルをセーブするダイアグラム"""
+    save = ObjectProperty(None)
+    text_input = ObjectProperty(None)
+    cancel = ObjectProperty(None)
 
 
 class ShowWidget(Widget):
@@ -217,6 +237,48 @@ class ShowWidget(Widget):
     check1 = BooleanProperty(False)
     check2 = BooleanProperty(False)
     check3 = BooleanProperty(False)
+
+    loadfile = ObjectProperty(None)
+    savefile = ObjectProperty(None)
+    text_input = ObjectProperty(None)
+
+    def dismiss_popup(self):
+        self._popup.dismiss()
+
+    def show_load(self):
+        content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Load file", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def show_save(self):
+        content = SaveDialog(save=self.save, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Save file", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def load(self, path, filename):
+        with open(os.path.join(path, filename[0])) as stream:
+            self.text_input.text = stream.read()
+
+        self.dismiss_popup()
+
+    def save(self, path, filename):
+        print(path)
+        print(filename)
+        with open(os.path.join(path, filename+'.png'), 'w') as stream:
+            stream.write()
+            #stream.write(self.text_input.text)
+
+        self.dismiss_popup()
+
+    #def save_graph(self):
+    #    """graphの保存"""
+    #    #filechooser = Root()
+    #    #filechooser.show_save()
+    #    content = PopupChooseFile(select=self.select, cancel=self.cancel)
+    #    self.popup = Popup(title="Select MP3", content=content)
+    #    self.popup.open()
 
     #------ ShowWidgetの初期化 ---------------
     def __init__(self, **kwargs):
