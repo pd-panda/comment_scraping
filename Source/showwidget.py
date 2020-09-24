@@ -67,7 +67,7 @@ class SubGrids(BoxLayout):
     """init時にラベル名を引数として与える"""
     def __init__(self, word, **kwargs):
         super().__init__(**kwargs)
-        self.height= self.minimum_height
+        #self.height= self.minimum_height
         #self.clear_widgets()
         #GridLayout.__init__(self, cols=2, raws=1)
 
@@ -77,18 +77,22 @@ class SubGrids(BoxLayout):
         self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
         
 
-class ConfigPanel(GridLayout):
+class ConfigPanel(BoxLayout):
     def __init__(self, word, **kwargs): 
         super().__init__(**kwargs)
-        self.height= self.minimum_height
+        #GridLayout.__init__(self, cols=1, rows=3)
         # test用　データがなくても表示されるよ
         #GridLayout.__init__(self, cols=1, rows=3)
-        #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
-        #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
-        #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+        self.clear_widgets()
+        self.orientation = "vertical"
+        #self.height= self.minimum_height
+        self.add_widget(Label(text="aaa", color=[0.23,0.23,0.23,1]))
+        self.add_widget(Label(text="bbb", color=[0.23,0.23,0.23,1]))
+        self.add_widget(Label(text="ccc", color=[0.23,0.23,0.23,1]))
         
     # Widget追加時にword抽出をする
     #def make_words_list(self, word):
+        """
         try:
             word_df = dataglp.get_all_word()
         except:
@@ -98,6 +102,7 @@ class ConfigPanel(GridLayout):
             #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
             #self.add_widget(SubGrids(word="aaa"))
             self.clear_widgets()
+            print(len(word_df))
             GridLayout.__init__(self, cols=1, rows=len(word_df))
             #self.height = self.height * 0.05
             #self.size_hint_y = None
@@ -107,32 +112,34 @@ class ConfigPanel(GridLayout):
             for _, str_word in (dataglp.get_all_word()).iteritems():
                 print(str_word)
                 self.add_widget(SubGrids(word=str_word))
-            
+        """
         pass
 
 
-class Panels(GridLayout):
+class Panels(BoxLayout):
     """詳細設定をするためのウィジェット"""
     def __init__(self, **kwargs): 
         super().__init__(**kwargs)
         lists = ["tagai","hamada"]
+        self.orientation = "vertical"
         #GridLayout.__init__(self, cols=1, rows=3)
         #GridLayout.__init__(self, cols=1, rows=len(lists))
         # 縦に分割してラベルを表示できるようにはなった
         #self.add_widget(Label(text= lists[0]))
         #self.add_widget(Label(text= lists[0]))
         #self.add_widget(Label(text= lists[1]))
-        """
+        
         # 縦に（チェックボックス , ラベル）の塊を表示したい
         self.add_widget(ConfigPanel("aaa"))
         self.add_widget(ConfigPanel("bbb"))
         self.add_widget(ConfigPanel("ccc"))
-        """
+        
         #self.add_widget(ConfigPanel("ddd"))
         
     def make_config_panel(self, lists):
         #self.clear_widgets()
         print(len(lists))
+        """
         self.height= self.minimum_height
         GridLayout.__init__(self, cols=1, rows=len(lists))
 
@@ -142,6 +149,7 @@ class Panels(GridLayout):
         for text in lists:
             print(text)
             self.add_widget(ConfigPanel(text))
+        """
 
         """
         , 
@@ -196,7 +204,9 @@ class GraphView(BoxLayout):
         super().__init__(*args, **kwargs)
         #self.state = True
         # 描画領域を用意する
-        self.fig, self.ax = plt.subplots()
+        #self.fig, self.ax = plt.subplots()
+        self.fig = plt.figure(figsize=(16, 9))
+        self.ax = self.fig.add_subplot(111)
         # 描画を初期化する
         self.init_view()
 
@@ -304,8 +314,8 @@ class GraphView(BoxLayout):
             print("func5 play")
             dataglp.switch_graph(self.fig, self.ax, "拍手の推移", "df_time_hakusyu_point_100")
         elif funcname == "func6":
-            print("func5 play")
-            print(dataglp.get_all_URL())
+            print("func6 play")
+            dataglp.switch_graph(self.fig, self.ax, "参照URLランキング", "urltable")
         elif funcname == "func7":
             dataglp.switch_graph(self.fig, self.ax, "参照URLランキング", "urltable")
 
