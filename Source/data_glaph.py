@@ -458,9 +458,6 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
             y = np.random.rand(tmp)
             self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) 
             ax.plot(x, y, 'ko',alpha=0)
-        if len(colx) > 5:
-            # 時間のラベルを5個に変更
-            plt.xticks(colx[::(-(-len(colx)//5))])
 
 #----------------------拍手画像表示----------------------
     def imscatter(self,x, y, image, ax=None, zoom=1): 
@@ -708,13 +705,19 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
 
         elif (graph_name == "bargraph_word"):
             self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
-            
-        elif (graph_name == "urltable"):
-            flag = self.print_table(self.df_URL_point,5, fig, ax)
-
+          
         elif (graph_name == "bargraph_contributor" and self.scr_case == False):
             self.print_bar_graph_df(self.df_contributor_point,'contributor', fig, ax)
+            
+        elif (graph_name == "bargraph_negapozi" and self.scr_case == False):
+            self.print_bar_graph_2(self.df_time_positive_negative,['positive','negative'], fig, ax)
+            
+        elif (graph_name == "wordtable"):
+            flag = self.print_table(self.df_URL_point,5,['URL','コメント数'], fig, ax)
 
+        elif (graph_name == "urltable"):
+            flag = self.print_table(self.df_word_point,5,['単語','コメント数'], fig, ax)
+            
         elif (graph_name == "df_time_word_point_line_100"):
             self.print_line_graph(self.df_time_word_point,self.rank_word,100,fig, ax)
 
@@ -724,13 +727,16 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         elif (graph_name == "df_time_word_point_stack_5" and self.scr_case == False):
             self.print_line_graph(self.df_time_contributor_point,self.rank_contributor,5, fig, ax, 'stack')
 
-        elif (graph_name == "df_time_negapozi_5"):
-            self.print_line_graph(self.df_time_negapozi,'negapozi',5, fig, ax)
+        elif (graph_name == "df_time_negapozi_100"):
+            self.print_line_graph(self.df_time_negapozi,['positive','negative','nil'],100, fig, ax)
 
         elif (graph_name == "df_time_www_point_100"):
             flag = self.print_www( self.df_time_www_point,100, fig, ax)
 
         elif (graph_name == "df_time_hakusyu_point_100"):
             flag = self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)
+        
+        elif (graph_name == "piegraph_negapozi"):
+            flag = self.print_pie_graph(self.df_time_positive_negative, ['positive','negative','nil'], fig, ax)
         
         self.setting_graph(fig, ax, title, flag)
