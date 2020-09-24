@@ -523,7 +523,7 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
                     label += [i]
         plt.pie(data, labels=label,autopct="%1.1f%%")
 #----------------------折れ線グラフ描画----------------------------------------------
-    def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line',flag2 = True):
+    def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line',flag2 = True,label = False):
         #区切る時間を指定して，グラフ用df作成
         df = self.df_time__(df,cutnum,flag)
         j=0
@@ -532,7 +532,10 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
             flatui = ["#ed7d31", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
             current_palette =sns.color_palette(flatui, 24)
         else : current_palette = sns.color_palette(n_colors=24)
-
+        
+        if label == False:
+            label = word
+        
         # ラベルとして表示するtimeを格納
         labels = df[df.columns[0]]
         # plot用データ格納
@@ -542,6 +545,7 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
 
         if type(word) == str:
             data = plt.plot(labels,df[word],marker="o")
+            label = [label]
         else:
             for i in word :
                 if flag2 != True and j == 2:
@@ -555,7 +559,7 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
             plt.xticks(labels[::(-(-len(labels)//5))])
         #plt.xticks(df[df.columns[0]][::5]+[df[df.columns[0]][-1]]) # 要検証
         
-        ax.legend(data, word, loc='upper right', borderaxespad=1, fontsize=18)
+        ax.legend(data, label, loc='upper right', borderaxespad=1, fontsize=18)
 
 #----------------区切る時間を指定して，グラフ用df作成---------------------------
 #h:m:s
@@ -658,6 +662,18 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         return self.df_URL_point['URL']
 
 #--------------------------------------------------------------------------------------------------------------------------------------
+ #グラフを画像にして保存
+    def make_png(self,path,fig):
+        fig.savefig(path)
+#データがないときに画像を出力
+    def print_noddata():
+        ax.axis('off')
+        image_path ='nodata2.png'
+        image = plt.imread(os.path.join(sourcedir, "image", image_path))
+        image = np.asarray( image)
+        plt.imshow(image)
+        
+        
 #-------------------------------------main-------------------------------------------------------------------
     def init_graph(self, df, scr_case = False) :
 
