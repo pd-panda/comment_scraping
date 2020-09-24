@@ -638,7 +638,7 @@ class DataGraph:
         """ debug用 """
         if flag == True:
             # タイトルの設定（名前、位置）
-            plt.title(title, fontsize=32,fontweight="bold")
+            plt.title(title, fontsize=18,fontweight="bold")
             ttl = ax.title
             ttl.set_position([.5, 1.05])
     
