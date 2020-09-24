@@ -415,7 +415,7 @@ class DataGraph:
         else :
             ax.axis('off')
             image_path ='nodata.png'
-            image = plt.imread(image_path) 
+            image = plt.imread(os.path.join(sourcedir, "image", image_path)) 
             plt.imshow(image)
             return False 
 
@@ -476,8 +476,8 @@ class DataGraph:
                 plt.xticks(colx[::(-(-len(colx)//5))])
         else :
             ax.axis('off')
-            image_path ='nodata.png'
-            image = plt.imread(image_path) 
+            image_path = 'nodata.png'
+            image = plt.imread(os.path.join(sourcedir, "image", image_path)) 
             plt.imshow(image)
             return False 
 
@@ -504,7 +504,7 @@ class DataGraph:
         if len(df) == 0:
             ax.axis('off')
             image_path ='nodata.png'
-            image = plt.imread(image_path)
+            image = plt.imread(os.path.join(sourcedir, "image", image_path))
             image = np.asarray( image)
             plt.imshow(image)
             return False

@@ -67,7 +67,12 @@ class SubGrids(BoxLayout):
     """init時にラベル名を引数として与える"""
     def __init__(self, word, **kwargs):
         super().__init__(**kwargs)
+        self.height= self.minimum_height
+        #self.clear_widgets()
         #GridLayout.__init__(self, cols=2, raws=1)
+
+        #self.height = self.parent.height * 0.05
+        #self.size_hint_y = None
         self.add_widget(CheckBox(size_hint_x=None, width=75))
         self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
         
@@ -75,6 +80,7 @@ class SubGrids(BoxLayout):
 class ConfigPanel(GridLayout):
     def __init__(self, word, **kwargs): 
         super().__init__(**kwargs)
+        self.height= self.minimum_height
         # test用　データがなくても表示されるよ
         #GridLayout.__init__(self, cols=1, rows=3)
         #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
@@ -93,6 +99,8 @@ class ConfigPanel(GridLayout):
             #self.add_widget(SubGrids(word="aaa"))
             self.clear_widgets()
             GridLayout.__init__(self, cols=1, rows=len(word_df))
+            #self.height = self.height * 0.05
+            #self.size_hint_y = None
             #self.add_widget(Label(text="単語一覧", color=[0.23,0.23,0.23,1]))
             #self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
             #GridLayout.__init__(self, cols=2, rows=-(-len(word_df)//2))
@@ -108,7 +116,7 @@ class Panels(GridLayout):
     def __init__(self, **kwargs): 
         super().__init__(**kwargs)
         lists = ["tagai","hamada"]
-        GridLayout.__init__(self, cols=1, rows=3)
+        #GridLayout.__init__(self, cols=1, rows=3)
         #GridLayout.__init__(self, cols=1, rows=len(lists))
         # 縦に分割してラベルを表示できるようにはなった
         #self.add_widget(Label(text= lists[0]))
@@ -125,6 +133,9 @@ class Panels(GridLayout):
     def make_config_panel(self, lists):
         #self.clear_widgets()
         print(len(lists))
+        self.height= self.minimum_height
+        GridLayout.__init__(self, cols=1, rows=len(lists))
+
         #GridLayout.__init__(self, cols=1, rows=len(lists))
         #self.add_widget(ConfigPanel("aaa"))
         #self.add_widget(ConfigPanel("bbb"))

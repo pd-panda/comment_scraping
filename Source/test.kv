@@ -190,6 +190,7 @@
                     height: self.minimum_height
                     GridLayout:
                         cols:1
+                        rows:9
                         size_hint_y: None
                         #size_hint_y: 0.5
                         #row_default_height: 10
@@ -356,7 +357,9 @@
                         size_hint_x: 0.5
                         size_hint_y: None
                         #pos_hint: {"x":0, "top":1}
-                        height: self.parent.height
+                        #size: self.size
+                        #height: self.parent.height
+                        height: self.minimum_height
                         padding: [10, 30]
                         spacing: [20, 50]
                         id: conpanel
