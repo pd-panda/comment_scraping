@@ -231,11 +231,18 @@ class DataGraph:
         else:return False 
 #----------------URL判別用プログラム----------------
     def URL_hanbetu(self,string):
-        parsed_url = urlparse(string)
-        if 'h' in parsed_url.scheme:
+        if 'htt' in string:
+            tmp = string.index('htt')
+            string = string[tmp:]
+            if '\n' in string:
+                tmp = string.index('\n')
+                string = string[:tmp]
+            if ' ' in string:
+                tmp = string.index(' ')
+                string = string[:tmp]   
+            parsed_url = urlparse(string)
             url = '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(string))
         else : url = False
-    
         return url 
 #----------------ネガポジ判断----------------
     def negapozi_hanbetu(self,word,df_kanzyou) :
