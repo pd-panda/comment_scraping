@@ -172,12 +172,23 @@
             #    source: 'sakotomo.png'
             #    size_hint_y: 0.5
             size_hint_x: 1 - (425 / root.width)
+            AnchorLayout:
+                anchor_x: 'right'
+                anchor_y: 'top'
+                size_hint_y: 0.1
+                Button:
+                    size_hint_x: None
+                    width: self.parent.height
+                    #pos_hint: {'center_x':0.5, 'center_y':0.5}
+                    background_normal: './Source/image/download.png'
+                    on_press: root.show_save()
+                    #text: "グラフを保存する"
             GraphView:
                 id: graph_view
                 #size_hint_y: root.height - 300
                 size_hint_y: 0.6
             ScrollView:
-                size_hint_y: 0.4
+                size_hint_y: 0.3
                 #GridLayout:
                 #    cols:1
                 #    size_hint_y: None
@@ -380,3 +391,24 @@
     #        source: './Source/image/commentpanel.png'
     #        pos: self.pos
     #        size: self.size
+
+<PopupChooseFile>:
+    canvas:
+        Color:
+            rgba: 0, 0, .4, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    
+    orientation: "vertical"
+ 
+    FileChooserIconView:
+        size_hint: 1, .9
+        path: root.current_dir
+        on_submit: root.select(self.selection[0])
+    BoxLayout:
+        size_hint: 1, .1
+        Button:
+            text: "Cancel"
+            background_color: 0,.5,1,1
+            on_release: root.cancel()
