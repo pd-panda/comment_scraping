@@ -38,54 +38,6 @@ class DataGraph:
         df = pd.read_csv(os.path.join(sourcedir, fname))
         df = df.dropna(how='all').dropna(how='all', axis=1)
         return df
-#-----------------------------------------------------------treemap---------------------------------------------------------
-#------------------treemap出力用------------------------　
-    #引数:データフレームとタイトル
-    def print_treemap(self, df, fig, ax) :
-        #ソート
-        df = self.rank_sort(df,False)
-        #最大文字数検索
-        max_num = self.max_word_num(df) 
-
-        sns.set()
-        matplotlib.rcParams['figure.figsize'] = (16.0, 9.0)
-        # ggplot style使用
-        style.use('ggplot')
-        sns.set(font="IPAexGothic") #日本語フォント設定
-
-        # Colormap
-        cmap = matplotlib.cm.Blues
-
-        # Min and Max Values
-        #割合作成後dfに追加
-        df = self.add_percent(df)
-        mini = min(df["Population"])
-        maxi = max(df["Population"])   
-
-        # colors setting
-        norm = matplotlib.colors.Normalize(vmin=mini, vmax=maxi)
-        colors = [cmap(norm(value)) for value in df["Population"]]
-
-        # Plotting
-        #squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors, text_kwargs={'fontsize':int(100/max_num),'color':'black'})
-        squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors)
-        # 軸削除
-        plt.axis('off')
-        # y軸逆に
-        plt.gca().invert_yaxis()
-
-#-------------------割合作成後dfに追加----------------------
-    def add_percent(self, df) :
-        s = df['point'].sum()
-        df["Population"] = 0.0
-
-        for i in range(len(df['point'])) :
-            a = df['point'][i] /float(s) * 100.0
-            df["Population"][i] = a
-
-        return df
-#--------------------------------------------------------------------------------------------------------------------------------------
-
 #-----------------------------------------------------------構文解析&データ作成---------------------------------------------------------
 
 #------------コメントデータからデータ抽出＆データフレーム作成--------------
@@ -101,7 +53,6 @@ class DataGraph:
         df_time_positive_negative = pd.DataFrame(index=[], columns=['time','positive','negative','nil'])#ネガポジdf
 
         
-        #print(df_word_point)
         for i in range(len(df)):
             p=0
             n=0
@@ -113,8 +64,6 @@ class DataGraph:
                 tmp = self.my_index(df_URL_point['URL'],url)
                 df_URL_point = self.make_df_append(df_URL_point,tmp,url)
             
-            #print("記号削除前")
-            #print(df_word_point)
             #記号削除中
             print(df['comment'][i])
             df['comment'][i] = self.my_delete(df['comment'][i])
@@ -127,13 +76,15 @@ class DataGraph:
             #時間ごとのコメント数計算
             tmp = self.my_index(df_time_point['time'],tmp_time)
             df_time_point = self.make_df_append(df_time_point,tmp,tmp_time)
-            #print(url)
+
+            
             #wwwがあったら1追加なかったら0追加
             if False != self.www_hanbetu(df['comment'][i]) and url == False:
                 df_time_www_point = self.make_df_append(df_time_www_point,tmp,tmp_time)
             else:
                 if False == tmp :
                     df_time_www_point = df_time_www_point.append({'time': tmp_time, 'point': 0}, ignore_index=True)
+                    
             #拍手があったら1追加なかったら0追加
             if False != self.hakusyu_hanbetu(df['comment'][i]):
                 df_time_hakusyu_point = self.make_df_append(df_time_hakusyu_point,tmp,tmp_time)
@@ -143,7 +94,7 @@ class DataGraph:
 
                 #構文解析
                 result = jumanpp.analysis(df['comment'][i])
-                #print(result)
+
                 #分析結果からdf作成
                 for token in result.mrph_list():
                     tmp_word = token.midasi
@@ -157,7 +108,7 @@ class DataGraph:
                         #名詞とその時の時間
                             df_time_word = df_time_word.append({'time':tmp_time,'word': tmp_word}, ignore_index=True)
                             
-                            #ネガポジ判断
+                #ネガポジ判断
                             tmp = self.negapozi_hanbetu(tmp_word,df_kanzyou)
                             if tmp == 'p':
                                 p +=1
@@ -280,6 +231,7 @@ class DataGraph:
 
         for row in word:
             df_time_word_point[row] = 0
+            
             #特定の単語の配列番号取得
             tmp_list = [i for i, x in enumerate(df_time_word['word'] == row) if x == True]
             for i in tmp_list:
@@ -296,7 +248,6 @@ class DataGraph:
 
         contributor = df_contributor_point['contributor']
 
-        #print(df_time_contributor_point_stack['time'])
 
         for row in contributor:
             df_time_contributor_point[row] = 0
@@ -349,78 +300,113 @@ class DataGraph:
                 max = len(word)
 
         return max
+
 #--------------------------------------------------------------------------------------------------------------------------------------
+#====================================================-出力用====================================================================
+#-----------------------------------------------------------treemap---------------------------------------------------------
+#------------------treemap出力用------------------------　
+    #引数:データフレームとタイトル
+    def print_treemap(self, df, fig, ax) :
+        #ソート
+        df = self.rank_sort(df,False)
+        #最大文字数検索
+        max_num = self.max_word_num(df) 
+
+        sns.set()
+        matplotlib.rcParams['figure.figsize'] = (16.0, 9.0)
+        # ggplot style使用
+        style.use('ggplot')
+        sns.set(font="IPAexGothic") #日本語フォント設定
+
+        # Colormap
+        cmap = matplotlib.cm.Blues
+
+        # Min and Max Values
+        #割合作成後dfに追加
+        df = self.add_percent(df)
+        mini = min(df["Population"])
+        maxi = max(df["Population"])   
+
+        # colors setting
+        norm = matplotlib.colors.Normalize(vmin=mini, vmax=maxi)
+        colors = [cmap(norm(value)) for value in df["Population"]]
+
+        # Plotting
+        #squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors, text_kwargs={'fontsize':int(100/max_num),'color':'black'})
+        squarify.plot(sizes=df["Population"], label=df['word'], alpha=0.8, color=colors)
+        # 軸削除
+        plt.axis('off')
+        # y軸逆に
+        plt.gca().invert_yaxis()
+
+#-------------------割合作成後dfに追加----------------------
+    def add_percent(self, df) :
+        s = df['point'].sum()
+        df["Population"] = 0.0
+
+        for i in range(len(df['point'])) :
+            a = df['point'][i] /float(s) * 100.0
+            df["Population"][i] = a
+
+        return df
+#--------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 #-----------------------------------------------------------棒グラフ---------------------------------------------------------
-
 #---------------------棒グラフ出力用--------------------------
     def print_bar_graph_df(self, df, calamu, fig, ax):
+        #dfソート
         df = self.rank_sort(df,True)
-        #plt.tight_layout()
-        #plt.rcParams["font.size"] = 25
-        #plt.figure(figsize=(10,20 ), dpi=50,facecolor='#FFFFFF')
+
         plt.barh(df[calamu], df['point'])
         plt.grid(which='major',color='black',linestyle='-',axis = "x")
-        #plt.show()
+        
+#---------------------積立式棒グラフ出力用--------------------------        
+def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
+    #cutpointの数棒グラフが出るようにcuttime作成
+    tmp = (df['time'].iloc[-1]-df['time'].iloc[0])/cutpoint
+    #区切る時間を指定して，グラフ用df作成
+    df = self.df_time__(df,int(tmp))
+    #出力
+    ax.bar(df['time'], df[calamu[0]])
+    sum = df[calamu[0]]
+    for i in range(len(calamu)-1):
+        ax.bar(df['time'], df[calamu[i+1]], bottom=sum)
+        sum += df[calamu[i+1]]
 
-#--------------------------------------------------------------------------------------------------------------------------------------
-#-------------------------------------------get関数-------------------------------------------------
-
-    # 単語（名詞）の数を取得
-    def get_word_num(self):
-        return len(self.df_word_point['word'])
-
-    # 単語（名詞）を全て取得
-    def get_all_word(self):
-        return self.df_word_point['word']
-
-    # 投稿者数の取得
-    def get_contributor_num(self):
-        return len(self.df_contributor_point['contributor'])
-
-    # 投稿者名を全て取得
-    def get_all_contributor(self):
-        return self.df_contributor_point['contributor']
-    
-    # 最初・最後のコメント投稿時間の取得
-    def get_start_end_time(self):
-        return self.df_time_point[0],self.df_time_point[-1]
-    
-    # コメント投稿時間を全て取得
-    def get_all_time(self):
-        return self.df_time_point['time']
-    
-    # 投稿されたURLを全て取得
-    def get_all_URL(self):
-        return self.df_URL_point['URL']
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------散布図---------------------------------------------------------
 #----------------------------------wwwwww描画用-------------------------------------------
-#wwwの散布図表示用
     def print_www(self,df,cutnum, fig, ax, flag='line'):
+        #区切る時間を指定して，グラフ用df作成
         df = self.df_time__(df,cutnum,flag)
         i = 0
+        #x軸のみ出力
         plt.tick_params(labelbottom=True,
             labelleft=False,
             labelright=False,
             labeltop=False)
         flag = False
         colx = df[df.columns[0]]
-        #ax = plt.figure(figsize=(30,10), dpi=50,facecolor='#FFFFFF')     
         for tmp in df['point']:
-            x =[]
-            y = np.random.rand(tmp)
-            for j in range(tmp):
-                x = x + [colx[i]]
-            color = self.rand_green(np.random.rand(1))
-            if tmp > 0:
+            if tmp != 0:
+                x =[]
+                y = np.random.rand(tmp)
+                for j in range(tmp):
+                    x = x + [colx[i]]
+                #wの色決め
+                color = self.rand_green(np.random.rand(1))
+                plt.scatter(x,y, c=color,s=1800, marker="$w$",alpha=0.5)
+            
                 flag = True
-            i+=1
-            plt.scatter(x,y, c=color,s=1800, marker="$w$",alpha=0.5)
+                i+=1
+                
         if  flag == True:
             if len(colx) > 5:
             # 時間のラベルを5個に変更
-                plt.xticks(colx[0::(-(-len(colx)//5))]) 
+                plt.xticks(colx[0::(-(-len(colx)//5))])
+        #一度もwが出力されなかったら、画像を表示
         else :
             ax.axis('off')
             image_path ='nodata.png'
@@ -429,8 +415,7 @@ class DataGraph:
             return False 
 
 
-        #plt.show()
-#色決め
+#----------------------色決め----------------------
     def rand_green(self,rand):
         if rand <= 0.1:
             return '#66FF66'
@@ -453,15 +438,15 @@ class DataGraph:
         elif rand <= 1.0 :
             return '#339966'
         else : return '#339966'
-#-----------------------------------------------------------拍手表示用---------------------------------------------------------
-#拍手散布図表示用
+#----------------------拍手散布図表示用----------------------
     def print_hakusyu(self,df,cutnum, fig, ax,flag='line'):
+        #区切る時間を指定して，グラフ用df作成
         df = self.df_time__(df,cutnum,flag)
         i = 0
-        flag = False
-        #fig, ax = plt.subplots()     
+        flag = False    
         image_path ='1922466.png'
         colx = df[df.columns[0]]
+        #x軸のみ出力
         plt.tick_params(labelbottom=True,
                 labelleft=False,
                 labelright=False,
@@ -469,16 +454,14 @@ class DataGraph:
     
        
         for tmp in df['point']:
-            x =[]
-            y = np.random.rand(tmp)
-            if tmp > 0:
+            if tmp != 0:
+                x =[]
+                y = np.random.rand(tmp)
                 flag = True
-            for j in range(tmp):
-                x = x + [colx[i]]
-            self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) # path.join()
-            ax.plot(x, y, 'ko',alpha=0)
-        #plt.savefig('cactus_plot.png',dpi=200, transparent=False) 
-        #plt.show()
+                for j in range(tmp):
+                    x = x + [colx[i]]
+                self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) 
+                ax.plot(x, y, 'ko',alpha=0)
         if  flag == True:
             if len(colx) > 5:
                 # 時間のラベルを5個に変更
@@ -489,7 +472,7 @@ class DataGraph:
             image = plt.imread(os.path.join(sourcedir, "image", image_path)) 
             plt.imshow(image)
             return False 
-
+#----------------------拍手画像表示----------------------
     def imscatter(self,x, y, image, ax=None, zoom=1): 
         if ax is None: 
             ax = plt.gca() 
@@ -507,8 +490,10 @@ class DataGraph:
         ax.update_datalim(np.column_stack([x, y])) 
         ax.autoscale() 
         return artists 
+
 #--------------------------------------------------------------------------------------------------------------------------------------
-#-----------------------------------------------------------表の作成---------------------------------------------------------
+
+#----------------------表の作成----------------------
     def print_table (self,df,endnum,fig,ax):
         if len(df) == 0:
             ax.axis('off')
@@ -528,7 +513,7 @@ class DataGraph:
         tb = ax.table(cellText=df.values[:endnum],
                        colWidths=[1,0.5],
                     colLabels=df.columns[:endnum],
-                    bbox=[0, 1-1/5*endnum, 1,1/5*endnum],
+                    bbox=[0, 1-1/endnum*endnum, 1,1/endnum*endnum],
                     )
 
         tb[0, 0].set_facecolor('#363636')
@@ -536,8 +521,7 @@ class DataGraph:
         tb[0, 0].set_text_props(color='w')
         tb[0, 1].set_text_props(color='w')
         return True
-#--------------------------------------------------------------------------------------------------------------------------------------
-#-----------------------------------------------------------円グラフ---------------------------------------------------------
+#----------------------円グラフ----------------------
     def print_pie_graph(self,df,word,fig,ax,flag = 'negapozi'):
         label = []
         data =[]
@@ -551,12 +535,12 @@ class DataGraph:
                     data = data + [df['point'][index]]
                     label += [i]
         plt.pie(data, labels=label,autopct="%1.1f%%")
-#-----------------------------------------------------------折れ線グラフ---------------------------------------------------------
-
 #----------------------折れ線グラフ描画----------------------------------------------
     def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line',flag2 = True):
+        #区切る時間を指定して，グラフ用df作成
         df = self.df_time__(df,cutnum,flag)
         j=0
+        #カラーパレット指定
         if flag2 != True:
             flatui = ["#ed7d31", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
             current_palette =sns.color_palette(flatui, 24)
@@ -655,51 +639,39 @@ class DataGraph:
     
 #--------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------
-#-------------------------------------main-------------------------------------------------------------------
-    def main_graph_test(self, df, fig, ax) :
-    #------------データ作成----------------
-        #感情推定用df
-        df_kanzyou = self.csv_df('kanzyou.csv')
-        #東山昌彦、乾健太郎、松本裕治、述語の選択選好性に着目した名詞評価極性の獲得、言語処理学会第14回年次大会論文集、pp.584-587、2008。/東山雅彦、乾健太郎、松本雄二。動詞と形容詞の選択的選好からの名詞の感情の学習、自然言語処理協会の第14回年次会議の議事録、pp.584-587、2008年。
-        
-        #csvファイルをデータフレームに変換
-        #df = csv_df(data)
-        #コメントデータからデータ抽出＆データフレーム作成
-        df_time_word,df_word_point,df_time_point,df_time_www_point,df_time_hakusyu_point = self.string_word_point(df)
-        #人とその人のコメント数のdf作成
-        df_contributor_point = self.make_df_contributor_point(df)
+#===========================================================================================================================================
+#-------------------------------------------get関数-------------------------------------------------
 
-        #各時間でのネガティブかポジティブかをdfに
-        df_time_negapozi = self.make_df_time_negapozi(df_time_word,df_time_point,df_kanzyou)
-        #各時間の単語ごとの出現数のdf作成
-        df_time_word_point_stack,df_time_word_point_line = self.time_word_point(df_time_word,df_word_point,df_time_point)
-        #各時間の人ごとの出現数のdf作成
-        df_time_contributor_point_stack,df_time_contributor_point_line = self.time_contributor_point(df,df_time_point,df_contributor_point)
-    #------------------保存変数-----------------------------------
-        rank_contributor = self.make_rank_word(2,df_contributor_point,'contributor')
-        rank_word  = self.make_rank_word(5,df_word_point,'word')
+    # 単語（名詞）の数を取得
+    def get_word_num(self):
+        return len(self.df_word_point['word'])
 
+    # 単語（名詞）を全て取得
+    def get_all_word(self):
+        return self.df_word_point['word']
 
+    # 投稿者数の取得
+    def get_contributor_num(self):
+        return len(self.df_contributor_point['contributor'])
 
-    #--------------表示-----------------------
-        ##折れ線グラフ描画
-        #self.print_line_graph(df_time_word_point_line,rank_word,100)
-        #self.print_line_graph( df_time_contributor_point_line,rank_contributor,5)
-        #self.print_line_graph( df_time_contributor_point_stack,rank_contributor,5,'stack')
-        #self.print_line_graph(df_time_negapozi,'negapozi',5)
-        #self.print_www( df_time_www_point,100)
-        #self.print_hakusyu(df_time_hakusyu_point,100)
+    # 投稿者名を全て取得
+    def get_all_contributor(self):
+        return self.df_contributor_point['contributor']
     
+    # 最初・最後のコメント投稿時間の取得
+    def get_start_end_time(self):
+        return self.df_time_point[0],self.df_time_point[-1]
+    
+    # コメント投稿時間を全て取得
+    def get_all_time(self):
+        return self.df_time_point['time']
+    
+    # 投稿されたURLを全て取得
+    def get_all_URL(self):
+        return self.df_URL_point['URL']
 
-        #棒グラフ出力用
-        #self.print_bar_graph_df(df_word_point,'word')
-        #self.print_bar_graph_df(df_contributor_point,'contributor')
-        #treemap出力用　
-        #return self.print_treemap(df_word_point,'treemap', fig, ax)
-        self.print_treemap(df_word_point,'treemap', fig, ax)
-#--------------------------------------------
-
-
+#--------------------------------------------------------------------------------------------------------------------------------------
+#-------------------------------------main-------------------------------------------------------------------
     def init_graph(self, df, scr_case = False) :
 
         """
