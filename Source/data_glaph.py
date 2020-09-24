@@ -389,30 +389,25 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
             labeltop=False)
         flag = False
         colx = df[df.columns[0]]
-        for tmp in df['point']:
-            if tmp != 0:
-                x =[]
-                y = np.random.rand(tmp)
-                for j in range(tmp):
-                    x = x + [colx[i]]
-                #wの色決め
-                color = self.rand_green(np.random.rand(1))
-                plt.scatter(x,y, c=color,s=1800, marker="$w$",alpha=0.5)
-            
-                flag = True
-                i+=1
-                
-        if  flag == True:
-            if len(colx) > 5:
-            # 時間のラベルを5個に変更
-                plt.xticks(colx[0::(-(-len(colx)//5))])
-        #一度もwが出力されなかったら、画像を表示
-        else :
+        if df['point'].sum() == 0:
             ax.axis('off')
             image_path ='nodata.png'
-            image = plt.imread(os.path.join(sourcedir, "image", image_path)) 
+            image = plt.imread(image_path) 
             plt.imshow(image)
             return False 
+        for tmp in df['point']:
+            x =[]
+            y = np.random.rand(tmp)
+            for j in range(tmp):
+                x = x + [colx[i]]
+            #wの色決め
+            color = self.rand_green(np.random.rand(1))
+            plt.scatter(x,y, c=color,s=1800, marker="$w$",alpha=0.5)
+            i+=1
+                
+        if len(colx) > 5:
+        # 時間のラベルを5個に変更
+            plt.xticks(colx[0::(-(-len(colx)//5))])
 
 
 #----------------------色決め----------------------
@@ -447,31 +442,26 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         image_path ='1922466.png'
         colx = df[df.columns[0]]
         #x軸のみ出力
-        plt.tick_params(labelbottom=True,
+        plt.tick_params(labelbottom=False,
                 labelleft=False,
                 labelright=False,
                 labeltop=False)
-    
-       
-        for tmp in df['point']:
-            if tmp != 0:
-                x =[]
-                y = np.random.rand(tmp)
-                flag = True
-                for j in range(tmp):
-                    x = x + [colx[i]]
-                self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) 
-                ax.plot(x, y, 'ko',alpha=0)
-        if  flag == True:
-            if len(colx) > 5:
-                # 時間のラベルを5個に変更
-                plt.xticks(colx[::(-(-len(colx)//5))])
-        else :
+        if df['point'].sum() == 0:
             ax.axis('off')
-            image_path = 'nodata.png'
-            image = plt.imread(os.path.join(sourcedir, "image", image_path)) 
+            image_path ='nodata.png'
+            image = plt.imread(image_path) 
             plt.imshow(image)
             return False 
+   
+        for tmp in df['point']:
+            x = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
+            y = np.random.rand(tmp)
+            self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) 
+            ax.plot(x, y, 'ko',alpha=0)
+        if len(colx) > 5:
+            # 時間のラベルを5個に変更
+            plt.xticks(colx[::(-(-len(colx)//5))])
+
 #----------------------拍手画像表示----------------------
     def imscatter(self,x, y, image, ax=None, zoom=1): 
         if ax is None: 
