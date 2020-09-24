@@ -563,22 +563,31 @@ class DataGraph:
         tmp = []
         for i in range(len(df.columns)-1):
             tmp = tmp + [0]
-
+         i=0
         df_result = pd.DataFrame(index=[], columns = df.columns) 
-        for i in range(len(df)):
-            if df['time'][i] > start:
-                i -=1
+        while df['time'].iloc[-1] >= start:
+            j = 0
+            if df['time'][i] < start :
+                for column in df.columns[1:]:
+                    if flag == 'line':
+                        tmp[j] += df[column][i]
+                    else :
+                        tmp[j] = df[column][i]
+                    j += 1
+                i += 1
+                if i > len(df['time'])-1:break
+
+            else:
                 time = str(int((start%1000000)/10000)) + ':' +str(int((start%10000)/100))+':'+str(start%100)
                 tmp.insert(0, time)
                 df_2 = pd.DataFrame([tmp],columns=df_result.columns)
                 df_result = pd.concat([df_result, df_2], ignore_index=True)
                 tmp = tmp[1:]
-                
+
                 if flag == 'line' :
                     tmp = []
-                    for i in range(len(df.columns)-1):
+                    for j in range(len(df.columns)-1):
                         tmp = tmp + [0]
-                        
                 start += cuttime
                 if start % 100 >= 60:
                     start = start - 60 + 100
@@ -586,15 +595,13 @@ class DataGraph:
                     start = start - 6000 + 10000
                 if start >= 240000:
                     start = start - 240000 +1000000
-            else :
-                j = 0
-                for column in df.columns:
-                    if  column != 'time':
-                        tmp[j] += df[column][i]
-                        j += 1
+       
+
+                
         time = str(int((start%1000000)/10000)) + ':' +str(int((start%10000)/100))+':'+str(start%100)
         tmp.insert(0, time)
         df_2 = pd.DataFrame([tmp],columns=df_result.columns)
+        #tmp = pd.Series(tmp, index=df_result.columns)
         df_result = pd.concat([df_result, df_2])
 
         return df_result
