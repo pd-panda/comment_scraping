@@ -517,7 +517,7 @@ class DataGraph:
             image = np.asarray( image)
             plt.imshow(image)
             return False
-        df = rank_sort(df,False)
+        df = self.rank_sort(df,False)
         if endnum > len(df[df.columns[0]]):
             endnum = len(df[df.columns[0]])+1
         #fig, ax = plt.subplots(figsize=(2*len(df.columns),endnum))

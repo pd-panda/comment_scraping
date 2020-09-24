@@ -86,9 +86,9 @@ class ConfigPanel(BoxLayout):
         self.clear_widgets()
         self.orientation = "vertical"
         #self.height= self.minimum_height
-        self.add_widget(Label(text="aaa", color=[0.23,0.23,0.23,1]))
-        self.add_widget(Label(text="bbb", color=[0.23,0.23,0.23,1]))
-        self.add_widget(Label(text="ccc", color=[0.23,0.23,0.23,1]))
+        self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+        self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
+        self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
         
     # Widget追加時にword抽出をする
     #def make_words_list(self, word):
@@ -116,13 +116,13 @@ class ConfigPanel(BoxLayout):
         pass
 
 
-class Panels(BoxLayout):
+class Panels(GridLayout):
     """詳細設定をするためのウィジェット"""
     def __init__(self, **kwargs): 
         super().__init__(**kwargs)
         lists = ["tagai","hamada"]
         self.orientation = "vertical"
-        #GridLayout.__init__(self, cols=1, rows=3)
+        GridLayout.__init__(self, cols=1, rows=3)
         #GridLayout.__init__(self, cols=1, rows=len(lists))
         # 縦に分割してラベルを表示できるようにはなった
         #self.add_widget(Label(text= lists[0]))
