@@ -368,17 +368,17 @@ class DataGraph:
         plt.grid(which='major',color='black',linestyle='-',axis = "x")
         
 #---------------------積立式棒グラフ出力用--------------------------        
-def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
-    #cutpointの数棒グラフが出るようにcuttime作成
-    tmp = (df['time'].iloc[-1]-df['time'].iloc[0])/cutpoint
-    #区切る時間を指定して，グラフ用df作成
-    df = self.df_time__(df,int(tmp))
-    #出力
-    ax.bar(df['time'], df[calamu[0]])
-    sum = df[calamu[0]]
-    for i in range(len(calamu)-1):
-        ax.bar(df['time'], df[calamu[i+1]], bottom=sum)
-        sum += df[calamu[i+1]]
+    def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
+        #cutpointの数棒グラフが出るようにcuttime作成
+        tmp = (df['time'].iloc[-1]-df['time'].iloc[0])/cutpoint
+        #区切る時間を指定して，グラフ用df作成
+        df = self.df_time__(df,int(tmp))
+        #出力
+        ax.bar(df['time'], df[calamu[0]])
+        sum = df[calamu[0]]
+        for i in range(len(calamu)-1):
+            ax.bar(df['time'], df[calamu[i+1]], bottom=sum)
+            sum += df[calamu[i+1]]
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------散布図---------------------------------------------------------
@@ -397,7 +397,7 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         if df['point'].sum() == 0:
             ax.axis('off')
             image_path ='nodata.png'
-            image = plt.imread(image_path) 
+            image = plt.imread(os.path.join(sourcedir, "image", image_path)) 
             plt.imshow(image)
             return False 
         for tmp in df['point']:
@@ -454,7 +454,7 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         if df['point'].sum() == 0:
             ax.axis('off')
             image_path ='nodata.png'
-            image = plt.imread(image_path) 
+            image = plt.imread(os.path.join(sourcedir, "image", image_path)) 
             plt.imshow(image)
             return False 
    
@@ -486,7 +486,7 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 #----------------------表の作成----------------------
-    def print_table (self,df,endnum,fig,ax):
+    def print_table (self,df,endnum,columnnames,fig,ax):
         if len(df) == 0:
             ax.axis('off')
             image_path ='nodata.png'
@@ -503,9 +503,9 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         ax.axis('tight')
 
         tb = ax.table(cellText=df.values[:endnum],
-                       colWidths=[1,0.5],
-                    colLabels=df.columns[:endnum],
-                    bbox=[0, 1-1/endnum*endnum, 1,1/endnum*endnum],
+                    colWidths=[1,0.5],
+                    colLabels=columnnames,
+                    bbox=[0, 1-1/endnum*endnum, 1, 1/endnum*endnum]
                     )
 
         tb[0, 0].set_facecolor('#363636')
@@ -625,12 +625,18 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
 #--------------------------------------------------------------
 #-----------------グラフ初期化-----------------------------------
 
-    def first_graph(self, fig, ax):
+    def first_graph(self, fig):
         #fig = plt.figure(figsize=(16, 9))
-        ax.axis('off')
+        #ax.axis('off')
         ax = fig.add_subplot(111)
+        ax.axis('on')
         # 背景色
         fig.set_facecolor('#ffffff')
+        plt.tick_params(labelbottom=True,
+            labelleft=True,
+            labelright=False,
+            labeltop=False)
+        print("初期化したよ")
         return fig,ax
     
 #--------------------------------------------------------------
@@ -668,8 +674,9 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
 
 #--------------------------------------------------------------------------------------------------------------------------------------
  #グラフを画像にして保存
-    def make_png(self,path,fig):
+    def save_graph_to_png(self,path,fig):
         fig.savefig(path)
+
 #データがないときに画像を出力
     def print_noddata():
         ax.axis('off')
@@ -677,10 +684,9 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         image = plt.imread(os.path.join(sourcedir, "image", image_path))
         image = np.asarray( image)
         plt.imshow(image)
-        
-        
+
 #-------------------------------------main-------------------------------------------------------------------
-    def init_graph(self, df, scr_case = False) :
+    def init_graph(self, df, scr_case = False):
 
         """
         入力DataFrameを用いてグラフ描画用dfを初期化する
@@ -717,10 +723,11 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         
         self.rank_word  = self.make_rank_word(5,self.df_word_point,'word')
 
-    def switch_graph(self, fig, ax, title, graph_name = "treemap") :
-    
+    def switch_graph(self, fig, title, graph_name = "treemap") :
         flag = True
     #--------------表示-----------------------
+        fig, ax = self.first_graph(fig)
+
         if (graph_name == "treemap"):
             self.print_treemap(self.df_word_point, fig, ax)
 
@@ -733,10 +740,10 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
         elif (graph_name == "bargraph_negapozi" and self.scr_case == False):
             self.print_bar_graph_2(self.df_time_positive_negative,['positive','negative'], fig, ax)
             
-        elif (graph_name == "wordtable"):
+        elif (graph_name == "urltable"):
             flag = self.print_table(self.df_URL_point,5,['URL','コメント数'], fig, ax)
 
-        elif (graph_name == "urltable"):
+        elif (graph_name == "wordtable"):
             flag = self.print_table(self.df_word_point,5,['単語','コメント数'], fig, ax)
             
         elif (graph_name == "df_time_word_point_line_100"):
@@ -761,3 +768,5 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
             flag = self.print_pie_graph(self.df_time_positive_negative, ['positive','negative','neutral','null'], fig, ax)
         
         self.setting_graph(fig, ax, title, flag)
+        print(fig)
+        print(ax)
