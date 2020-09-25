@@ -79,6 +79,7 @@ class ConfigPanel(GridLayout):
             print("ファイルが読み込まれました")
             self.clear_widgets()
             GridLayout.__init__(self, cols=1, rows=len(word_df))
+            self.add_widget(Label(text=word, color=[0.23,0.23,0.23,1]))
             for _, str_word in (dataglp.get_all_word()).iteritems():
                 print(str_word)
                 self.add_widget(SubGrids(word=str_word))
@@ -90,16 +91,16 @@ class Panels(GridLayout):
     """詳細設定をするためのウィジェット"""
     def __init__(self, **kwargs): 
         super().__init__(**kwargs)
-        lists = ["tagai","hamada"]
+        lists = ["表示単語"]
     def make_config_panel(self, lists):
         # 呼び出される度にWidgetを初期化する
         self.clear_widgets()
         # リストの数だけパネルのGridLayoutを準備する
-        GridLayout.__init__(self, cols=1, rows=len(lists))
+        #GridLayout.__init__(self, cols=1, rows=len(lists))
         # リストの数だけConfigPanelをWidgetに追加
-        for text in lists:
-            print(text)
-            self.add_widget(ConfigPanel(text))
+        #for text in lists:
+        #    print(text)
+        #    self.add_widget(ConfigPanel(text))
 
 class GraphView(BoxLayout):
     """Matplotlib のグラフを表示するためのウィジェット"""
@@ -110,18 +111,27 @@ class GraphView(BoxLayout):
         self.fig = plt.figure(figsize=(16, 9))
         self.ax = self.fig.add_subplot(111)
         # 描画を初期化する
-        self.init_view()
+        #self.init_view()
         # グラフをウィジェットとして追加する
+        #widget = FigureCanvasKivyAgg(self.fig)
+        #self.add_widget(widget)
         widget = FigureCanvasKivyAgg(self.fig)
         self.add_widget(widget)
 
     def init_view(self):
+        self.fig = plt.figure(figsize=(16, 9))
+        self.ax = self.fig.add_subplot(111)
+
         # 以前の内容を消去する
         self.ax.clear()
+        plt.figure()
+
+        widget = FigureCanvasKivyAgg(self.fig)
+        self.add_widget(widget)
 
         # 再描画する
-        self.fig.canvas.draw()
-        self.fig.canvas.flush_events()
+        #self.fig.canvas.draw()
+        #self.fig.canvas.flush_events()
 
     def load_data(self):
         # テキストファイル読み込み
@@ -139,7 +149,7 @@ class GraphView(BoxLayout):
             print("どちらでもありません")
             return
         print(df)
-        dataglp.init_graph(df)
+        #dataglp.init_graph(df)
         # 最初のグラフを出力
         self.update_view(df, "func1")
     
@@ -150,17 +160,31 @@ class GraphView(BoxLayout):
         # スレッド処理で返り値を受け取るようにしたい・・・
         #t1 = threading.Thread(target=scr.main, args=["カフカ読書会"])
         #t1.start()
-        dataglp.init_graph(df)
+        #dataglp.init_graph(df)
         print("scraper end!!!")
         print(df)
         self.update_view(df, "func1")
 
     def update_view(self, df, funcname):
+
+        #self.fig = plt.figure(figsize=(16, 9))
+        #self.ax = self.fig.add_subplot(111)
+
         # 以前の内容を消去する
         self.ax.clear()
+        #plt.figure()
+
+        dataglp.init_graph(df)
+        self.plot_graph(funcname)
+
+        #widget = FigureCanvasKivyAgg(self.fig)
+        #self.add_widget(widget)
+
+        # 以前の内容を消去する
+        #self.ax.clear()
 
         #dataglp.init_graph(df)
-        self.plot_graph(funcname)
+        #self.plot_graph(funcname)
 
         # 再描画する
         self.fig.canvas.draw()
@@ -173,36 +197,41 @@ class GraphView(BoxLayout):
         self.check = checkbox.active
         return
     
+    def save_graph(self, savepath):
+        dataglp.save_graph_to_png(savepath,self.fig)
+        print("グラフを保存しました!!")
+    
     def plot_graph(self, funcname):
         """dataglp.switch_graph(fig, ax, グラフタイトル, 呼び出し関数名)"""
+        #self.fig.delaxes(self.ax)
         if funcname == "func1":
             # 単語出現数の推移の表示
             print("単語出現数の推移 plot")
-            dataglp.switch_graph(self.fig, self.ax, "単語出現数の推移", "df_time_word_point_line_100")
+            dataglp.switch_graph(self.fig, "単語出現数の推移", "df_time_word_point_line_100")
         elif funcname == "func2":
             # ホットワードの表示
             print("ホットワード plot")
-            dataglp.switch_graph(self.fig, self.ax, "ホットワード", "treemap")
+            dataglp.switch_graph(self.fig, "ホットワード", "treemap")
         elif funcname == "func3":
             # コメントの多い投稿者の表示
             print("コメントの多い投稿者 play")
-            dataglp.switch_graph(self.fig, self.ax, "コメントの多い投稿者", "bargraph_contributor")
+            dataglp.switch_graph(self.fig, "コメントの多い投稿者", "bargraph_contributor")
         elif funcname == "func4":
             # 笑いの推移の表示
             print("笑いの推移 play")
-            dataglp.switch_graph(self.fig, self.ax, "笑いの推移", "df_time_www_point_100")
+            dataglp.switch_graph(self.fig, "笑いの推移", "df_time_www_point_100")
         elif funcname == "func5":
             # 拍手の推移の表示
             print("拍手の推移 play")
-            dataglp.switch_graph(self.fig, self.ax, "拍手の推移", "df_time_hakusyu_point_100")
+            dataglp.switch_graph(self.fig, "拍手の推移", "df_time_hakusyu_point_100")
         elif funcname == "func6":
             # 参照URLランキングの表示
             print("func6 play")
-            dataglp.switch_graph(self.fig, self.ax, "参照URLランキング", "urltable")
+            dataglp.switch_graph(self.fig, "参照URLランキング", "urltable")
         elif funcname == "func7":
             # 参照URLランキングの表示
             print("func7 play")
-            dataglp.switch_graph(self.fig, self.ax, "参照URLランキング", "urltable")
+            dataglp.switch_graph(self.fig, "参照URLランキング", "urltable")
 
 class PopupChooseFile(BoxLayout):
  
@@ -266,9 +295,14 @@ class ShowWidget(Widget):
     def save(self, path, filename):
         print(path)
         print(filename)
-        with open(os.path.join(path, filename+'.png'), 'w') as stream:
-            stream.write()
-            #stream.write(self.text_input.text)
+        savedir = os.path.dirname(path)
+        if os.path.splitext(filename)[1] == ".png":
+            savepath = os.path.join(savedir, filename)
+        else :
+            savepath = os.path.join(savedir, filename+".png")
+        print(savepath)
+        graphpanel = self.ids.graph_view
+        graphpanel.save_graph(savepath)
 
         self.dismiss_popup()
 
