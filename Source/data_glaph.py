@@ -429,7 +429,6 @@ class DataGraph:
                     tmp_data += [0]
                 df_2 = pd.DataFrame([tmp_data],columns=df_result.columns)
                 df_result = pd.concat([df_result, df_2], ignore_index=True)
-
                 j = 0
                 for column in df.columns[1:]:
                     df_result[column][tmp_index[j]] += 1
@@ -448,7 +447,7 @@ class DataGraph:
                 if start >= 240000:
                     start = start - 240000 +1000000 
             if df['time'].iloc[-1] < start: break              
-
+              
         return df_result
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------散布図---------------------------------------------------------
@@ -783,7 +782,6 @@ class DataGraph:
         #flag       : 'stack','line' 線グラフの時に使い分けてね(print_line_graph)                       default : 'line'
         #flag2      : negapozi判断をするときは'negapozi'をつけてね(print_line_graph,print_pie_graph)    default : ''
         #label      : ラベルを別の名前にしたいときは入力してね(print_line_graph)                         default : False
-        
         
         # 1000ms刻みの累計コメント折れ線グラフ
         if(graph_name == "df_timepoint_line_1000"):
