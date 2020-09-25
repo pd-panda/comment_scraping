@@ -201,7 +201,7 @@
                     height: self.minimum_height
                     GridLayout:
                         cols:1
-                        rows:9
+                        rows:11
                         size_hint_y: None
                         #size_hint_y: 0.5
                         #row_default_height: 10
@@ -215,13 +215,13 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.ids.graph_view.check
                                 on_press: root.ids.graph_view.checkbox_check(self, "func1")
                             Label:
-                                text: "コメント数"
+                                text: "コメント数の推移"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
@@ -232,13 +232,13 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.ids.graph_view.check
                                 on_press: root.ids.graph_view.checkbox_check(self, "func2")
                             Label:
-                                text: "TreeMap"
+                                text: "ホットワード検出"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
@@ -249,13 +249,13 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.ids.graph_view.check
                                 on_press: root.ids.graph_view.checkbox_check(self, "func3")
                             Label:
-                                text: "投稿者数"
+                                text: "投稿者数ごとのコメント数"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
@@ -266,13 +266,13 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.ids.graph_view.check
                                 on_press: root.ids.graph_view.checkbox_check(self, "func4")
                             Label:
                                 text: "笑い検出"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
@@ -283,13 +283,13 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.ids.graph_view.check
                                 on_press: root.ids.graph_view.checkbox_check(self, "func5")
                             Label:
                                 text: "拍手検出"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
@@ -301,13 +301,13 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.ids.graph_view.check
                                 on_press: root.ids.graph_view.checkbox_check(self, "func6")
                             Label:
-                                text: "URLランキング"
+                                text: "参照URLランキング"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
@@ -318,13 +318,13 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.check_radio
                                 on_press: root.checkbox_check(self, "func7")
                             Label:
-                                text: "コメントネガポジ判断"
+                                text: "ポジネガ単語数推移グラフ"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
@@ -335,13 +335,13 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.ids.graph_view.check
-                                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+                                on_press: root.ids.graph_view.checkbox_check(self, "func8")
                             Label:
-                                text: "拍手検出"
+                                text: "ポジネガ単語棒グラフ"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
@@ -353,13 +353,47 @@
                             size_hint_y: None
                             CheckBox:
                                 group: 'radio'
-                                size_hint_x: 0.3
+                                size_hint_x: 0.2
                                 active: root.ids.graph_view.check
-                                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+                                on_press: root.ids.graph_view.checkbox_check(self, "func9")
                             Label:
-                                text: "拍手検出"
+                                text: "入退室棒グラフ"
                                 color: [0.23,0.23,0.23,1]
-                                size_hint_x: 0.7
+                                size_hint_x: 0.8
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.2
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func10")
+                            Label:
+                                text: "入退室棒グラフ2"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.8
+                                font_size: 24
+                                halign: 'left'
+                                valign: 'middle'
+                                text_size: self.size
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            height: self.parent.height * 0.05
+                            size_hint_y: None
+                            CheckBox:
+                                group: 'radio'
+                                size_hint_x: 0.2
+                                active: root.ids.graph_view.check
+                                on_press: root.ids.graph_view.checkbox_check(self, "func11")
+                            Label:
+                                text: "ポジ・ネガ単語の割合"
+                                color: [0.23,0.23,0.23,1]
+                                size_hint_x: 0.8
                                 font_size: 24
                                 halign: 'left'
                                 valign: 'middle'
