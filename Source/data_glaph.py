@@ -368,9 +368,9 @@ class DataGraph:
         plt.grid(which='major',color='black',linestyle='-',axis = "x")
         
 #---------------------積立式棒グラフ出力用--------------------------        
-    def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
-        #cutpointの数棒グラフが出るようにcuttime作成
-        tmp = (df['time'].iloc[-1]-df['time'].iloc[0])/cutpoint
+    def print_bar_graph_2(self,df,calamu,fig,ax,labelnum = 5):
+        #labelnumの数棒グラフが出るようにcuttime作成
+        tmp = (df['time'].iloc[-1]-df['time'].iloc[0])/labelnum
         #区切る時間を指定して，グラフ用df作成
         df = self.df_time__(df,int(tmp))
         #出力
@@ -379,13 +379,86 @@ class DataGraph:
         for i in range(len(calamu)-1):
             ax.bar(df['time'], df[calamu[i+1]], bottom=sum)
             sum += df[calamu[i+1]]
+#---------------------棒グラフ出力用(in率)--------------------------
+    def print_barh_graph_df(self,df,calamu,fig,ax,labelnum = 5):
+        colors = ["#ed7d31",'#c0c0c0']
+        df = self.df_time__barh(df,500)
+        for i in range(len(df['time'])):
+            ax.barh(calamu, df[calamu].iloc[i], left=df[calamu].iloc[:i].sum() ,color =colors[i%2] )
+        self.make_label(df,labelnum,df[calamu[0]].iloc[:i].sum(),ax)
+#---------------------横軸を時間にして出力--------------------------
+    def make_label(self,df,labelnum,max,ax):
+        colx = df['time']
+        if len(colx) > labelnum:
+            tmp = labelnum
+        else :
+            tmp = len(colx)
+        label = []
+        label_string = []
+        for i in range(tmp):
+            label += [max / tmp * i]
+            label_string += [colx[int(len(colx)/tmp*i)]]
+        label += [max]
+        label_string +=[colx.iloc[-1]]
+        ax.set_xticks(label)
+        ax.set_xticklabels(label_string)
+#---------------------入退室予想専用df作成--------------------------
+    def df_time__barh(self,df,cuttime):
+        start = df['time'][0]
+        tmp = []
+        tmp_index = []
+    
+        for j in range(len(df.columns)-1):
+            tmp = tmp + [0]
+            tmp_index = tmp_index + [0]
+            
+        i=0
+        df_result = pd.DataFrame(index=[], columns = df.columns) 
+        while True:
+            if df['time'][i] < start :
+                j = 0
+                for column in df.columns[1:]:
+                    if df[column][i] > 0:
+                        tmp[j] = 1
+                    j += 1
+                i += 1
+                if i > len(df['time'])-1:break
 
+            else:
+                time = str(int((start%1000000)/10000)) + ':' +str(int((start%10000)/100))+':'+str(start%100)
+                tmp_data = [time]
+                for column in df.columns[1:]:
+                    tmp_data += [0]
+                df_2 = pd.DataFrame([tmp_data],columns=df_result.columns)
+                df_result = pd.concat([df_result, df_2], ignore_index=True)
+
+                j = 0
+                for column in df.columns[1:]:
+                    df_result[column][tmp_index[j]] += 1
+                    if tmp[j] == 0 and tmp_index[j]  % 2 == 0 :
+                        tmp_index[j] += 1
+                    elif tmp[j] == 1 and tmp_index[j] % 2 == 1:
+                        tmp_index[j] += 1
+                    tmp[j] = 0
+                    j+= 1
+
+                start += cuttime
+                if start % 100 >= 60:
+                    start = start - 60 + 100
+                if start % 1000 >= 6000:
+                    start = start - 6000 + 10000
+                if start >= 240000:
+                    start = start - 240000 +1000000 
+            if df['time'].iloc[-1] < start: break              
+
+        return df_result
 #--------------------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------散布図---------------------------------------------------------
 #----------------------------------wwwwww描画用-------------------------------------------
-    def print_www(self,df,cutnum, fig, ax, flag='line'):
+    def print_www(self,df,cutnum, fig, ax, flag='line',labelnum = 5):
         #区切る時間を指定して，グラフ用df作成
         df = self.df_time__(df,cutnum,flag)
+        colors = ["#66FF66",'#00FF00','#00CC00', '#33CC66', '#99CC00','#006633','#003300', '#99FF00','#99CC00','#339966']
         i = 0
         #x軸のみ出力
         plt.tick_params(labelbottom=True,
@@ -400,57 +473,35 @@ class DataGraph:
             image = plt.imread(os.path.join(sourcedir, "image", image_path)) 
             plt.imshow(image)
             return False 
+        
         for tmp in df['point']:
             x =[]
             y = np.random.rand(tmp)
+            color_tmp = int(np.random.rand(1)*10)
             for j in range(tmp):
                 x = x + [colx[i]]
             #wの色決め
-            color = self.rand_green(np.random.rand(1))
-            plt.scatter(x,y, c=color,s=1800, marker="$w$",alpha=0.5)
+            plt.scatter(x,y, c=colors[color_tmp],s=1800, marker="$w$",alpha=0.8)
             i+=1
                 
-        if len(colx) > 5:
+        if len(colx) > labelnum:
         # 時間のラベルを5個に変更
-            plt.xticks(colx[0::(-(-len(colx)//5))])
+            plt.xticks(colx[0::(-(-len(colx)//labelnum))])
 
-
-#----------------------色決め----------------------
-    def rand_green(self,rand):
-        if rand <= 0.1:
-            return '#66FF66'
-        elif rand <= 0.2 :
-            return '#00FF00'
-        elif rand <= 0.3 :
-            return '#00CC00'
-        elif rand <= 0.4 :
-            return '#33CC66'
-        elif rand <= 0.5 :
-            return '#99CC00'
-        elif rand <= 0.6 :
-            return '#006633'
-        elif rand <= 0.7 :
-            return '#003300'
-        elif rand <= 0.8 :
-            return '#99FF00'
-        elif rand <= 0.9 :
-            return '#99CC00'
-        elif rand <= 1.0 :
-            return '#339966'
-        else : return '#339966'
 #----------------------拍手散布図表示用----------------------
-    def print_hakusyu(self,df,cutnum, fig, ax,flag='line'):
+    def print_hakusyu(self,df,cutnum, fig, ax,flag='line',labelnum = 5):
         #区切る時間を指定して，グラフ用df作成
         df = self.df_time__(df,cutnum,flag)
+        image_path =['redhandclap.png','yellowhandclap.png','bluehandclap.png']
         i = 0
         flag = False    
-        image_path ='1922466.png'
         colx = df[df.columns[0]]
         #x軸のみ出力
         plt.tick_params(labelbottom=False,
                 labelleft=False,
                 labelright=False,
                 labeltop=False)
+        
         if df['point'].sum() == 0:
             ax.axis('off')
             image_path ='nodata.png'
@@ -461,7 +512,8 @@ class DataGraph:
         for tmp in df['point']:
             x = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
             y = np.random.rand(tmp)
-            self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path), ax=ax,  zoom=.025) 
+            index = int(np.random.rand(1) *10) %3
+            self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path[index]), ax=ax,  zoom=.025) 
             ax.plot(x, y, 'ko',alpha=0)
 
 #----------------------拍手画像表示----------------------
@@ -514,11 +566,12 @@ class DataGraph:
         tb[0, 1].set_text_props(color='w')
         return True
 #----------------------円グラフ----------------------
-    def print_pie_graph(self,df,word,fig,ax,flag = 'negapozi'):
+    def print_pie_graph(self,df,word,fig,ax,flag2 = ''):
         label = []
         data =[]
+        pie_colors = ["#ed7d31", "#3498db", "g", "m", "y"]
         for i in word :
-            if flag == 'negapozi':
+            if flag2 == 'negapozi':
                 data = data + [df[i].sum()]
                 label += [i]
             else :
@@ -526,16 +579,15 @@ class DataGraph:
                 if index != False:
                     data = data + [df['point'][index]]
                     label += [i]
-        plt.pie(data, labels=label,autopct="%1.1f%%")
+        plt.pie(data, labels=label,autopct="%1.1f%%",counterclock=True,colors=pie_colors,startangle=90)
 #----------------------折れ線グラフ描画----------------------------------------------
-    def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line',flag2 = True,label = False):
+    def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line',flag2 = '',label = False,labelnum = 5):
         #区切る時間を指定して，グラフ用df作成
         df = self.df_time__(df,cutnum,flag)
         j=0
         #カラーパレット指定
-        if flag2 != True:
-            flatui = ["#ed7d31", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
-            current_palette =sns.color_palette(flatui, 24)
+        if flag2 != 'negapozi':
+            current_palette = {'positive':"#ed7d31", 'negative':"#3498db", 'neutral':"#65ab31",'null': "#c0c0c0"}
         else : current_palette = sns.color_palette(n_colors=24)
         
         if label == False:
@@ -546,23 +598,22 @@ class DataGraph:
         # plot用データ格納
         data =[]
 
-        #plt.legend(loc="upper left", fontsize=18)
-
         if type(word) == str:
-            data = plt.plot(labels,df[word],marker="o")
+            if flag2 != True:
+                data = plt.plot(labels,df[word],marker="o")
+            else :data = plt.plot(left,df[word],marker="o",color=current_palette[j],linewidth = 3.0)
             label = [label]
         else:
             for i in word :
-                if flag2 != True and j == 2:
-                    data = data + plt.plot(labels, df[i],marker="o",color=current_palette[j],linestyle='dashdot',linewidth = 3.0)
+                if flag2 != 'negapozi':
+                    data = data + plt.plot(left, df[i],marker="o",color=current_palette[i],linewidth = 3.0)
            
                 else :data = data + plt.plot(labels, df[i],marker="o",color=current_palette[j],linewidth = 3.0)
                 j+=1
         
-        if len(labels) > 5:
-            # 時間のラベルを5個飛ばしに変更
-            plt.xticks(labels[::(-(-len(labels)//5))])
-        #plt.xticks(df[df.columns[0]][::5]+[df[df.columns[0]][-1]]) # 要検証
+        if len(labels) > labelnum:
+            # 時間のラベルをlabelnum個飛ばしに変更
+            plt.xticks(labels[::(-(-len(labels)//labelnum))])
         
         ax.legend(data, label, loc='upper right', borderaxespad=1, fontsize=18)
 
@@ -728,9 +779,15 @@ class DataGraph:
     #--------------表示-----------------------
         fig, ax = self.first_graph(fig)
 
+        #labelnum   : x軸に表示するメモリの数-1                                                        default : 5
+        #flag       : 'stack','line' 線グラフの時に使い分けてね(print_line_graph)                       default : 'line'
+        #flag2      : negapozi判断をするときは'negapozi'をつけてね(print_line_graph,print_pie_graph)    default : ''
+        #label      : ラベルを別の名前にしたいときは入力してね(print_line_graph)                         default : False
+        
         if (graph_name == "treemap"):
             self.print_treemap(self.df_word_point, fig, ax)
-
+        if(graph_name == "df_timepoint_line_100"):
+            self.print_line_graph(self.df_time_point,'point',100,fig,ax,label='コメント数')
         elif (graph_name == "bargraph_word"):
             self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
           
@@ -739,6 +796,13 @@ class DataGraph:
             
         elif (graph_name == "bargraph_negapozi" and self.scr_case == False):
             self.print_bar_graph_2(self.df_time_positive_negative,['positive','negative'], fig, ax)
+        
+        elif (graph_name == "bargraph_nyuutaisitu" and self.scr_case == False):
+            #人数を減らしたかったら df_human_point['contributor'] -> self.rank_contributor
+            self.print_barh_graph_df(self.df_time_human_point,self.df_human_point['contributor'],fig,ax)
+        
+        elif (graph_name == "bargraph_nyuutaisitu" and self.scr_case == False):
+            self.print_bar_graph_2( self.df_time_positive_negative,['positive','negative'],fig,ax)
             
         elif (graph_name == "urltable"):
             flag = self.print_table(self.df_URL_point,5,['URL','コメント数'], fig, ax)
@@ -756,7 +820,7 @@ class DataGraph:
             self.print_line_graph(self.df_time_contributor_point,self.rank_contributor,5, fig, ax, 'stack')
 
         elif (graph_name == "df_time_negapozi_100"):
-            self.print_line_graph(self.df_time_negapozi,['positive','negative','nil'],100, fig, ax)
+            self.print_line_graph(self.df_time_negapozi,['neutral','negative','positive'],100, fig, ax)
 
         elif (graph_name == "df_time_www_point_100"):
             flag = self.print_www( self.df_time_www_point,100, fig, ax)
