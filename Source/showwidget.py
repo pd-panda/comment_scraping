@@ -18,11 +18,14 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label 
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.image import Image as ImageKivy
+from kivy.uix.button import Button
 
 from kivy.graphics import Color, Rectangle
 
 # kivy.unix.popupクラスを使ってPopUpを生成する
 from kivy.uix.popup import Popup
+
+from functools import partial
 
 # matplotlib組み込み
 import numpy as np
@@ -62,6 +65,8 @@ savefilepath = os.path.join(savefiledir, savefilename)
 loadfilepath = ""
 
 df = pd.DataFrame()
+
+lists_id = []
 
 class SubGrids(BoxLayout):
     """チェックボックスとラベルでできたウィジェットを追加"""
@@ -106,44 +111,41 @@ class Panels(GridLayout):
             print(text)
             self.add_widget(Label(text=text))
             #self.add_widget(ConfigPanel(text))
-    def make_pozinega_config_panel(self):
+    def make_pozinega_config_panel(self, lists):
+        global lists_id
+        lists_id = {}
         # 呼び出される度にWidgetを初期化する
         self.clear_widgets()
-        self.padding= [10, 50] 
-        lists = ["ポジティブ", "ネガティブ", "ニュートラル", "NULL"]
-        #GridLayout.__init__(self, cols=1, rows=1, size_hint_y=None)
+        self.padding= [10, 50]
         gridpanel = GridLayout(cols=1, rows=6, size_hint_y=None, height= self.minimum_height)
-        #self.add_widget(Label(text="表示グラフ", font_size= 34, color=[0.23,0.23,0.23,1]))
         label = Label(text="表示グラフ", font_size= 34, color=[0.23,0.23,0.23,1])
         label.size = label.texture_size
         gridpanel.add_widget(label)
         lineimage = ImageKivy(source= os.path.join(imgdir,'line.png'), keep_ratio= True, size_hint_y=None, height= 45)
+        # タイトル下の棒を描く
         gridpanel.add_widget(lineimage)
-        for text in lists:
+        for index, text in enumerate(lists):
             checkpanel = BoxLayout(orientation='horizontal', size_hint_y=None, height= 45)
-            checkpanel.add_widget(CheckBox(size_hint_x=None,size_hint_y=None, width=75, height=35))
+            checkbox = CheckBox(size_hint_x=None,size_hint_y=None, width=75, height=35, active= True)
+            lists_id["configpanel" + str(index)] = checkbox
+            checkpanel.add_widget(checkbox)
             label = Label(text=text, font_size= 26, color=[0.23,0.23,0.23,1], size_hint_y=None, height=35)
-            #label.size = label.texture_size
             checkpanel.add_widget(label)
-            #self.add_widget(checkpanel)
             gridpanel.add_widget(checkpanel)
         with self.canvas.before:
             self.rect = Rectangle(source=os.path.join(imgdir,'commentpanel.png'), size=self.size, pos=self.pos)
         self.add_widget(gridpanel)
-        """
-        checkpanel1 = BoxLayout(orientation='horizontal', size_hint_y=None)
-        checkpanel1.add_widget(CheckBox(size_hint_x=None, width=75))
-        checkpanel1.add_widget(Label(text="ポジティブ", color=[0.23,0.23,0.23,1]))
-        self.add_widget(checkpanel1)
-        checkpanel2 = BoxLayout(orientation='horizontal', size_hint_y=None)
-        checkpanel2.add_widget(CheckBox(size_hint_x=None, width=75))
-        checkpanel2.add_widget(Label(text="ネガティブ", color=[0.23,0.23,0.23,1]))
-        self.add_widget(checkpanel2)
-        checkpanel2 = BoxLayout(orientation='horizontal', size_hint_y=None)
-        checkpanel2.add_widget(CheckBox(size_hint_x=None, width=75))
-        checkpanel2.add_widget(Label(text="ネガティブ", color=[0.23,0.23,0.23,1]))
-        self.add_widget(checkpanel2)
-        """
+
+    def make_config_panel_list(self, funcname):
+        # 生成したいチェックボックスを作る
+        if funcname == "func7":
+            lists = ["ポジティブ", "ネガティブ", "ニュートラル", "NULL"]
+        if funcname == "":
+            lists = []
+        else:
+            lists = []
+        self.make_pozinega_config_panel(lists)
+
 
 class GraphView(BoxLayout):
     """Matplotlib のグラフを表示するためのウィジェット"""
@@ -250,13 +252,15 @@ class GraphView(BoxLayout):
         dataglp.save_graph_to_png(savepath,self.fig)
         print("グラフを保存しました!!")
     
-    def plot_graph(self, funcname):
+    def plot_graph(self, funcname, lists= []):
         """dataglp.switch_graph(fig, ax, グラフタイトル, 呼び出し関数名)"""
         #self.fig.delaxes(self.ax)
         if funcname == "func1":
+            # 全コメント数推移
+            dataglp.switch_graph(self.fig, "単語出現数の推移", "df_timepoint_line_1000")
             # 単語出現数の推移の表示
-            print("単語出現数の推移 plot")
-            dataglp.switch_graph(self.fig, "単語出現数の推移", "df_time_word_point_line_100")
+            #print("単語出現数の推移 plot")
+            #dataglp.switch_graph(self.fig, "単語出現数の推移", "df_time_word_point_line_100")
         elif funcname == "func2":
             # ホットワードの表示
             print("ホットワード plot")
@@ -278,9 +282,25 @@ class GraphView(BoxLayout):
             print("func6 play")
             dataglp.switch_graph(self.fig, "参照URLランキング", "urltable")
         elif funcname == "func7":
-            # 参照URLランキングの表示
+            # ポジネガ単語数推移グラフの表示
             print("func7 play")
-            dataglp.switch_graph(self.fig, "参照URLランキング", "urltable")
+            dataglp.switch_graph(self.fig, "ポジネガ単語数推移グラフ", "df_time_negapozi_100", plot_lists=['positive','negative','neutral','null'])
+        elif funcname == "func8":
+            # ポジネガ単語棒グラフの表示
+            print("func8 play")
+            dataglp.switch_graph(self.fig, "ポジネガ単語棒グラフ", "piegraph_negapozi")
+        elif funcname == "func9":
+            # 入退室棒グラフの表示
+            print("func9 play")
+            dataglp.switch_graph(self.fig, "入退室棒グラフ", "bargraph_nyuutaisitu")
+        elif funcname == "func10":
+            # 参照URLランキングの表示
+            print("func10 play")
+            dataglp.switch_graph(self.fig, "入退室棒グラフ2", "bargraph_nyuutaisitu2")
+        elif funcname == "func11":
+            # 参照URLランキングの表示
+            print("func11 play")
+            dataglp.switch_graph(self.fig, "ポジティブ・ネガティブな単語の割合", "piegraph_negapozi")
 
 class PopupChooseFile(BoxLayout):
  
@@ -315,7 +335,7 @@ class ShowWidget(Widget):
     check1 = BooleanProperty(False)
     check2 = BooleanProperty(False)
     check3 = BooleanProperty(False)
-    check_radio = BooleanProperty(False)
+    check_radio = BooleanProperty(True)
 
     loadfile = ObjectProperty(None)
     savefile = ObjectProperty(None)
@@ -398,13 +418,17 @@ class ShowWidget(Widget):
         return
     
     def checkbox_check(self, checkbox, funcname):
-        # 表示グラフ指定チェックボックスが変化した時
+        global lists_id
         self.check_radio = checkbox.active
         graphpanel = self.ids.graph_view
         graphpanel.checkbox_check_test(funcname)
         configpanel = self.ids.conpanel
-        configpanel.make_pozinega_config_panel()
-        return
+        configpanel.make_config_panel_list(funcname)
+        # 表示グラフ指定チェックボックスが変化した時
+        if len(lists_id) != 0:
+            for index, item in lists_id.items():
+                print(item.active)
+
 
     #------ ウィンドウイベント -----------------
     def _on_file_drop(self, window, file_path):

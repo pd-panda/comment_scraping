@@ -54,9 +54,7 @@ class DataGraph:
 
         
         for i in range(len(df)):
-            p=0
-            n=0
-            nil =0
+            p= n= e= null= 0
             
             #URLだったら追加
             url=self.URL_hanbetu(df['comment'][i])
@@ -586,7 +584,7 @@ class DataGraph:
         df = self.df_time__(df,cutnum,flag)
         j=0
         #カラーパレット指定
-        if flag2 != 'negapozi':
+        if flag2 == 'negapozi':
             current_palette = {'positive':"#ed7d31", 'negative':"#3498db", 'neutral':"#65ab31",'null': "#c0c0c0"}
         else : current_palette = sns.color_palette(n_colors=24)
         
@@ -597,18 +595,20 @@ class DataGraph:
         labels = df[df.columns[0]]
         # plot用データ格納
         data =[]
-
+        print(df)
         if type(word) == str:
-            if flag2 != True:
-                data = plt.plot(labels,df[word],marker="o")
-            else :data = plt.plot(left,df[word],marker="o",color=current_palette[j],linewidth = 3.0)
+            if flag2 == 'negapozi':
+                data = plt.plot(labels,df[word],marker="o",color=current_palette[word])
+            else:
+                data = plt.plot(labels,df[word],marker="o",color=current_palette[j],linewidth = 3.0)
             label = [label]
         else:
             for i in word :
-                if flag2 != 'negapozi':
-                    data = data + plt.plot(left, df[i],marker="o",color=current_palette[i],linewidth = 3.0)
-           
-                else :data = data + plt.plot(labels, df[i],marker="o",color=current_palette[j],linewidth = 3.0)
+                print(i)
+                if flag2 == 'negapozi':
+                    data = plt.plot(labels,df[i],marker="o",color=current_palette[i])
+                else:
+                    data = data + plt.plot(labels, df[i],marker="o",color=current_palette[j],linewidth = 3.0)
                 j+=1
         
         if len(labels) > labelnum:
@@ -774,7 +774,7 @@ class DataGraph:
         
         self.rank_word  = self.make_rank_word(5,self.df_word_point,'word')
 
-    def switch_graph(self, fig, title, graph_name = "treemap") :
+    def switch_graph(self, fig, title, graph_name = "treemap", plot_lists = []) :
         flag = True
     #--------------表示-----------------------
         fig, ax = self.first_graph(fig)
@@ -784,29 +784,58 @@ class DataGraph:
         #flag2      : negapozi判断をするときは'negapozi'をつけてね(print_line_graph,print_pie_graph)    default : ''
         #label      : ラベルを別の名前にしたいときは入力してね(print_line_graph)                         default : False
         
-        if (graph_name == "treemap"):
+        
+        # 1000ms刻みの累計コメント折れ線グラフ
+        if(graph_name == "df_timepoint_line_1000"):
+            self.print_line_graph(self.df_time_point,'point',1000,fig,ax,label='コメント数')
+
+        # hotword出力
+        elif (graph_name == "treemap"):
             self.print_treemap(self.df_word_point, fig, ax)
-        if(graph_name == "df_timepoint_line_100"):
-            self.print_line_graph(self.df_time_point,'point',100,fig,ax,label='コメント数')
-        elif (graph_name == "bargraph_word"):
-            self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
-          
+
+        # コメントの多い投稿者順
         elif (graph_name == "bargraph_contributor" and self.scr_case == False):
             self.print_bar_graph_df(self.df_contributor_point,'contributor', fig, ax)
-            
+
+        # 笑いの検出
+        elif (graph_name == "df_time_www_point_100"):
+            flag = self.print_www( self.df_time_www_point,100, fig, ax)
+
+        # 拍手の検出
+        elif (graph_name == "df_time_hakusyu_point_100"):
+            flag = self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)
+
+        # 参照URL
+        elif (graph_name == "urltable"):
+            flag = self.print_table(self.df_URL_point,5,['URL','コメント数'], fig, ax)
+
+        # ポジネガ推移グラフ
+        elif (graph_name == "df_time_negapozi_100"):
+            self.print_line_graph(self.df_time_positive_negative,plot_lists,100, fig, ax, flag2 = 'negapozi', label= plot_lists)
+
+        # ポジネガ棒グラフ
         elif (graph_name == "bargraph_negapozi" and self.scr_case == False):
             self.print_bar_graph_2(self.df_time_positive_negative,['positive','negative'], fig, ax)
         
+        # 入退室棒グラフ
         elif (graph_name == "bargraph_nyuutaisitu" and self.scr_case == False):
             #人数を減らしたかったら df_human_point['contributor'] -> self.rank_contributor
             self.print_barh_graph_df(self.df_time_human_point,self.df_human_point['contributor'],fig,ax)
         
-        elif (graph_name == "bargraph_nyuutaisitu" and self.scr_case == False):
-            self.print_bar_graph_2( self.df_time_positive_negative,['positive','negative'],fig,ax)
-            
-        elif (graph_name == "urltable"):
-            flag = self.print_table(self.df_URL_point,5,['URL','コメント数'], fig, ax)
+        # 入退室棒グラフ2
+        elif (graph_name == "bargraph_nyuutaisitu2" and self.scr_case == False):
+            #人数を減らしたかったら df_human_point['contributor'] -> self.rank_contributor
+            self.print_barh_graph_df(self.df_time_human_point,self.df_human_point['contributor'],fig,ax)
 
+        # 単語の棒グラフ
+        elif (graph_name == "bargraph_word"):
+            self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
+        
+        # ??????????????
+        elif (graph_name == "bargraph_nyuutaisitu_2" and self.scr_case == False):
+            self.print_bar_graph_2( self.df_time_positive_negative,['positive','negative'],fig,ax)
+
+        # ?????????????
         elif (graph_name == "wordtable"):
             flag = self.print_table(self.df_word_point,5,['単語','コメント数'], fig, ax)
             
@@ -818,16 +847,8 @@ class DataGraph:
 
         elif (graph_name == "df_time_word_point_stack_5" and self.scr_case == False):
             self.print_line_graph(self.df_time_contributor_point,self.rank_contributor,5, fig, ax, 'stack')
-
-        elif (graph_name == "df_time_negapozi_100"):
-            self.print_line_graph(self.df_time_negapozi,['neutral','negative','positive'],100, fig, ax)
-
-        elif (graph_name == "df_time_www_point_100"):
-            flag = self.print_www( self.df_time_www_point,100, fig, ax)
-
-        elif (graph_name == "df_time_hakusyu_point_100"):
-            flag = self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)
         
+        # ポジネガ円グラフ
         elif (graph_name == "piegraph_negapozi"):
             flag = self.print_pie_graph(self.df_time_positive_negative, ['positive','negative','neutral','null'], fig, ax)
         
