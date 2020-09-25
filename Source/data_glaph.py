@@ -50,7 +50,7 @@ class DataGraph:
         df_time_www_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時のwww数のｄｆ
         df_time_hakusyu_point = pd.DataFrame(index=[], columns=['time','point'])#時間とその時の拍手数のｄｆ
         df_URL_point = pd.DataFrame(index=[], columns=['URL','point'])#URLまとめdf
-        df_time_positive_negative = pd.DataFrame(index=[], columns=['time','positive','negative','nil'])#ネガポジdf
+        df_time_positive_negative = pd.DataFrame(index=[], columns=['time','positive','negative','neutral','null'])#ネガポジdf
 
         
         for i in range(len(df)):
@@ -114,15 +114,18 @@ class DataGraph:
                                 p +=1
                             elif tmp == 'n':
                                 n +=1
-                            elif tmp == 'nil':
-                                nil +=1
+                            elif tmp == 'null':
+                                null +=1
+                            elif tmp == 'e':
+                                e +=1
                 index = self.my_index(df_time_positive_negative['time'],tmp_time)
                 if False !=index :
                     df_time_positive_negative['positive'][index]+= p
                     df_time_positive_negative['negative'][index]+= n
-                    df_time_positive_negative['nil'][index]+= nil
+                    df_time_positive_negative['null'][index]+= null
+                    df_time_positive_negative['neutral'][index]+= e
                 else :
-                    df_time_positive_negative = df_time_positive_negative.append({'time': tmp_time, 'positive': p,'negative': n,'nil':nil}, ignore_index=True)
+                    df_time_positive_negative = df_time_positive_negative.append({'time': tmp_time, 'positive': p,'negative': n,'neutral':e,'null':null}, ignore_index=True)
 
         return df_time_word,df_word_point,df_time_point,df_time_www_point, df_time_hakusyu_point,df_URL_point,df_time_positive_negative
 #---------------dfデータ追加プログラム-------------------
@@ -204,7 +207,9 @@ class DataGraph:
                 return 'p'
             if 'n' in df_kanzyou['negapozi'][tmp]:
                 return 'n'
-            return 'nil'   
+            if  'e' in df_kanzyou['negapozi'][tmp]:
+                    return 'e'
+            return 'null'   
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 #------------------------いろんなdf作成------------------------------------------------------
@@ -753,6 +758,6 @@ def print_bar_graph_2(self,df,calamu,fig,ax,cutpoint=5):
             flag = self.print_hakusyu(self.df_time_hakusyu_point, 100, fig, ax)
         
         elif (graph_name == "piegraph_negapozi"):
-            flag = self.print_pie_graph(self.df_time_positive_negative, ['positive','negative','nil'], fig, ax)
+            flag = self.print_pie_graph(self.df_time_positive_negative, ['positive','negative','neutral','null'], fig, ax)
         
         self.setting_graph(fig, ax, title, flag)
