@@ -319,10 +319,10 @@
                             CheckBox:
                                 group: 'radio'
                                 size_hint_x: 0.3
-                                active: root.ids.graph_view.check
-                                on_press: root.ids.graph_view.checkbox_check(self, "func7")
+                                active: root.check_radio
+                                on_press: root.checkbox_check(self, "func7")
                             Label:
-                                text: "URLランキング"
+                                text: "コメントネガポジ判断"
                                 color: [0.23,0.23,0.23,1]
                                 size_hint_x: 0.7
                                 font_size: 24
@@ -412,3 +412,35 @@
             text: "Cancel"
             background_color: 0,.5,1,1
             on_release: root.cancel()
+
+<posinegapanel>:
+    GridLayout:
+        cols:1
+        rows:9
+        size_hint_y: None
+        #size_hint_y: 0.5
+        #row_default_height: 10
+        height: self.minimum_height
+        size_hint_x: 0.5
+        padding: [10, 25] 
+        spacing: [10, 35] 
+        Label:
+            text: "表示グラフ"
+            color: [0.23,0.23,0.23,1]
+        BoxLayout:
+            orientation: 'horizontal'
+            height: self.parent.height * 0.05
+            size_hint_y: None
+            CheckBox:
+                size_hint_x: 0.3
+                active: root.ids.graph_view.check
+                on_press: root.ids.graph_view.checkbox_check(self, "func5")
+            Label:
+                text: "拍手検出"
+                color: [0.23,0.23,0.23,1]
+                size_hint_x: 0.7
+                font_size: 24
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.size
+    

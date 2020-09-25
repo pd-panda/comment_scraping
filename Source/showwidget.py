@@ -17,6 +17,9 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label 
 from kivy.uix.checkbox import CheckBox
+from kivy.uix.image import Image as ImageKivy
+
+from kivy.graphics import Color, Rectangle
 
 # kivy.unix.popupクラスを使ってPopUpを生成する
 from kivy.uix.popup import Popup
@@ -52,6 +55,7 @@ resource_add_path('./Source/fonts')
 LabelBase.register(DEFAULT_FONT, 'ヒラギノ丸ゴ ProN W4.ttc') #日本語が使用できるように日本語フォントを指定する
 
 imagedir = "./Source/image/"
+imgdir = "./Source/image"
 savefiledir = "./Source/csv"
 savefilename = "savecsvfile.csv"
 savefilepath = os.path.join(savefiledir, savefilename)
@@ -96,11 +100,50 @@ class Panels(GridLayout):
         # 呼び出される度にWidgetを初期化する
         self.clear_widgets()
         # リストの数だけパネルのGridLayoutを準備する
-        #GridLayout.__init__(self, cols=1, rows=len(lists))
+        GridLayout.__init__(self, cols=1, rows=len(lists))
         # リストの数だけConfigPanelをWidgetに追加
-        #for text in lists:
-        #    print(text)
-        #    self.add_widget(ConfigPanel(text))
+        for text in lists:
+            print(text)
+            self.add_widget(Label(text=text))
+            #self.add_widget(ConfigPanel(text))
+    def make_pozinega_config_panel(self):
+        # 呼び出される度にWidgetを初期化する
+        self.clear_widgets()
+        self.padding= [10, 50] 
+        lists = ["ポジティブ", "ネガティブ", "ニュートラル", "NULL"]
+        #GridLayout.__init__(self, cols=1, rows=1, size_hint_y=None)
+        gridpanel = GridLayout(cols=1, rows=6, size_hint_y=None, height= self.minimum_height)
+        #self.add_widget(Label(text="表示グラフ", font_size= 34, color=[0.23,0.23,0.23,1]))
+        label = Label(text="表示グラフ", font_size= 34, color=[0.23,0.23,0.23,1])
+        label.size = label.texture_size
+        gridpanel.add_widget(label)
+        lineimage = ImageKivy(source= os.path.join(imgdir,'line.png'), keep_ratio= True, size_hint_y=None, height= 45)
+        gridpanel.add_widget(lineimage)
+        for text in lists:
+            checkpanel = BoxLayout(orientation='horizontal', size_hint_y=None, height= 45)
+            checkpanel.add_widget(CheckBox(size_hint_x=None,size_hint_y=None, width=75, height=35))
+            label = Label(text=text, font_size= 26, color=[0.23,0.23,0.23,1], size_hint_y=None, height=35)
+            #label.size = label.texture_size
+            checkpanel.add_widget(label)
+            #self.add_widget(checkpanel)
+            gridpanel.add_widget(checkpanel)
+        with self.canvas.before:
+            self.rect = Rectangle(source=os.path.join(imgdir,'commentpanel.png'), size=self.size, pos=self.pos)
+        self.add_widget(gridpanel)
+        """
+        checkpanel1 = BoxLayout(orientation='horizontal', size_hint_y=None)
+        checkpanel1.add_widget(CheckBox(size_hint_x=None, width=75))
+        checkpanel1.add_widget(Label(text="ポジティブ", color=[0.23,0.23,0.23,1]))
+        self.add_widget(checkpanel1)
+        checkpanel2 = BoxLayout(orientation='horizontal', size_hint_y=None)
+        checkpanel2.add_widget(CheckBox(size_hint_x=None, width=75))
+        checkpanel2.add_widget(Label(text="ネガティブ", color=[0.23,0.23,0.23,1]))
+        self.add_widget(checkpanel2)
+        checkpanel2 = BoxLayout(orientation='horizontal', size_hint_y=None)
+        checkpanel2.add_widget(CheckBox(size_hint_x=None, width=75))
+        checkpanel2.add_widget(Label(text="ネガティブ", color=[0.23,0.23,0.23,1]))
+        self.add_widget(checkpanel2)
+        """
 
 class GraphView(BoxLayout):
     """Matplotlib のグラフを表示するためのウィジェット"""
@@ -197,6 +240,12 @@ class GraphView(BoxLayout):
         self.check = checkbox.active
         return
     
+    def checkbox_check_test(self, funcname):
+        global df
+        print(funcname)
+        self.update_view(df,funcname)
+        return
+    
     def save_graph(self, savepath):
         dataglp.save_graph_to_png(savepath,self.fig)
         print("グラフを保存しました!!")
@@ -266,6 +315,7 @@ class ShowWidget(Widget):
     check1 = BooleanProperty(False)
     check2 = BooleanProperty(False)
     check3 = BooleanProperty(False)
+    check_radio = BooleanProperty(False)
 
     loadfile = ObjectProperty(None)
     savefile = ObjectProperty(None)
@@ -345,6 +395,15 @@ class ShowWidget(Widget):
     def checkbox_check3(self, checkbox):
         # チェックボックス3が押された時
         self.check3 = checkbox.active
+        return
+    
+    def checkbox_check(self, checkbox, funcname):
+        # 表示グラフ指定チェックボックスが変化した時
+        self.check_radio = checkbox.active
+        graphpanel = self.ids.graph_view
+        graphpanel.checkbox_check_test(funcname)
+        configpanel = self.ids.conpanel
+        configpanel.make_pozinega_config_panel()
         return
 
     #------ ウィンドウイベント -----------------
