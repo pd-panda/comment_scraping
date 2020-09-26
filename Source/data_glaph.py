@@ -495,7 +495,7 @@ class DataGraph:
         flag = False    
         colx = df[df.columns[0]]
         #x軸のみ出力
-        plt.tick_params(labelbottom=False,
+        plt.tick_params(labelbottom=True,
                 labelleft=False,
                 labelright=False,
                 labeltop=False)
@@ -511,7 +511,7 @@ class DataGraph:
             x = (np.random.rand(tmp) / len(df[df.columns[0]])) + (1 / len(df[df.columns[0]]) * i )
             y = np.random.rand(tmp)
             index = int(np.random.rand(1) *10) %3
-            self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path[index]), ax=ax,  zoom=.025) 
+            self.imscatter(x, y, os.path.join(sourcedir, 'image', image_path[index]), ax=ax,  zoom=.075) 
             ax.plot(x, y, 'ko',alpha=0)
 
 #----------------------拍手画像表示----------------------
@@ -573,11 +573,12 @@ class DataGraph:
                 data = data + [df[i].sum()]
                 label += [i]
             else :
-                index = my_index(df[df.columns[0]],i)
+                index = self.my_index(df[df.columns[0]],i)
                 if index != False:
                     data = data + [df['point'][index]]
                     label += [i]
         plt.pie(data, labels=label,autopct="%1.1f%%",counterclock=True,colors=pie_colors,startangle=90)
+
 #----------------------折れ線グラフ描画----------------------------------------------
     def print_line_graph(self, df,word,cutnum, fig, ax, flag = 'line',flag2 = '',label = False,labelnum = 5):
         #区切る時間を指定して，グラフ用df作成
@@ -672,6 +673,8 @@ class DataGraph:
             plt.title(title, fontsize=18,fontweight="bold")
             ttl = ax.title
             ttl.set_position([.5, 1.05])
+        ax.set_aspect('auto')
+        ax.set_anchor(anchor ='C')
     
 #--------------------------------------------------------------
 #-----------------グラフ初期化-----------------------------------
@@ -729,7 +732,7 @@ class DataGraph:
         fig.savefig(path)
 
 #データがないときに画像を出力
-    def print_noddata():
+    def print_noddata(self, ax):
         ax.axis('off')
         image_path ='nodata2.png'
         image = plt.imread(os.path.join(sourcedir, "image", image_path))
@@ -811,7 +814,7 @@ class DataGraph:
 
         # ポジネガ推移グラフ
         elif (graph_name == "df_time_negapozi_100"):
-            self.print_line_graph(self.df_time_positive_negative,plot_lists,100, fig, ax, flag2 = 'negapozi', label= plot_lists)
+            self.print_line_graph(self.df_time_positive_negative,plot_lists,1000, fig, ax, flag2 = 'negapozi')
 
         # ポジネガ棒グラフ
         elif (graph_name == "bargraph_negapozi" and self.scr_case == False):
@@ -820,19 +823,14 @@ class DataGraph:
         # 入退室棒グラフ
         elif (graph_name == "bargraph_nyuutaisitu" and self.scr_case == False):
             #人数を減らしたかったら df_human_point['contributor'] -> self.rank_contributor
-            self.print_barh_graph_df(self.df_time_human_point,self.df_human_point['contributor'],fig,ax)
+            self.print_barh_graph_df(self.df_time_contributor_point,self.df_contributor_point['contributor'],fig,ax)
         
-        # 入退室棒グラフ2
-        elif (graph_name == "bargraph_nyuutaisitu2" and self.scr_case == False):
-            #人数を減らしたかったら df_human_point['contributor'] -> self.rank_contributor
-            self.print_barh_graph_df(self.df_time_human_point,self.df_human_point['contributor'],fig,ax)
-
         # 単語の棒グラフ
         elif (graph_name == "bargraph_word"):
             self.print_bar_graph_df(self.df_word_point,'word', fig, ax)
         
-        # ??????????????
-        elif (graph_name == "bargraph_nyuutaisitu_2" and self.scr_case == False):
+        # 積立ポジネガ棒グラフ
+        elif (graph_name == "bargraph_negapozi_funded" and self.scr_case == False):
             self.print_bar_graph_2( self.df_time_positive_negative,['positive','negative'],fig,ax)
 
         # ?????????????
@@ -850,7 +848,10 @@ class DataGraph:
         
         # ポジネガ円グラフ
         elif (graph_name == "piegraph_negapozi"):
-            flag = self.print_pie_graph(self.df_time_positive_negative, ['positive','negative','neutral','null'], fig, ax)
+            flag = self.print_pie_graph(self.df_time_positive_negative, ['positive','negative','neutral','null'], fig, ax, flag2 = 'negapozi')
+        
+        elif (graph_name == "nodata"):
+            self.print_noddata(ax)
         
         self.setting_graph(fig, ax, title, flag)
         print(fig)

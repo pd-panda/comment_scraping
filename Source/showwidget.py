@@ -111,40 +111,94 @@ class Panels(GridLayout):
             print(text)
             self.add_widget(Label(text=text))
             #self.add_widget(ConfigPanel(text))
-    def make_pozinega_config_panel(self, lists):
+    def make_pozinega_config_panel(self, lists, word, num):
         global lists_id
         lists_id = {}
         # 呼び出される度にWidgetを初期化する
         self.clear_widgets()
-        self.padding= [10, 50]
-        gridpanel = GridLayout(cols=1, rows=6, size_hint_y=None, height= self.minimum_height)
-        label = Label(text="表示グラフ", font_size= 34, color=[0.23,0.23,0.23,1])
+        self.padding= [10, 40]
+        gridpanel = GridLayout(cols=1, rows=num, size_hint_y=None, height= self.minimum_height, width= self.width, center=[650,800])
+        label = Label(text=word, font_size= 34, color=[0.23,0.23,0.23,1])
         label.size = label.texture_size
         gridpanel.add_widget(label)
         lineimage = ImageKivy(source= os.path.join(imgdir,'line.png'), keep_ratio= True, size_hint_y=None, height= 45)
         # タイトル下の棒を描く
         gridpanel.add_widget(lineimage)
+        
         for index, text in enumerate(lists):
-            checkpanel = BoxLayout(orientation='horizontal', size_hint_y=None, height= 45)
-            checkbox = CheckBox(size_hint_x=None,size_hint_y=None, width=75, height=35, active= True)
+            checkpanel = BoxLayout(orientation='horizontal', size_hint_x=None, size_hint_y=None, height= 55, width= gridpanel.width)
+            checkbox = CheckBox(size_hint_x=None,size_hint_y=None, width=75, height=55, active= True)
             lists_id["configpanel" + str(index)] = checkbox
             checkpanel.add_widget(checkbox)
-            label = Label(text=text, font_size= 26, color=[0.23,0.23,0.23,1], size_hint_y=None, height=35)
+            label = Label(text=text, font_size= 26, color=[0.23,0.23,0.23,1], size_hint_x=None, size_hint_y=None, height=55, width= gridpanel.width, valign= 'middle', max_lines = 1)
+            label.text_size= label.size
             checkpanel.add_widget(label)
             gridpanel.add_widget(checkpanel)
+        
         with self.canvas.before:
             self.rect = Rectangle(source=os.path.join(imgdir,'commentpanel.png'), size=self.size, pos=self.pos)
         self.add_widget(gridpanel)
+    
+    def make_tango_config_panel(self, lists, word, num):
+        global lists_id
+        lists_id = {}
+        try:
+            word_df = dataglp.get_all_word()
+        except:
+            print("ファイルが読み込まれていません")
+        else:
+            print("ファイルが読み込まれました")
+            # 呼び出される度にWidgetを初期化する
+            self.clear_widgets()
+            self.padding= [10, 40]
+            gridpanel = GridLayout(cols=1, rows=num, size_hint_y=None, height= self.minimum_height, width= self.width, center=[650,800])
+            label = Label(text=word, font_size= 34, color=[0.23,0.23,0.23,1])
+            label.size = label.texture_size
+            gridpanel.add_widget(label)
+            lineimage = ImageKivy(source= os.path.join(imgdir,'line.png'), keep_ratio= True, size_hint_y=None, height= 45)
+            # タイトル下の棒を描く
+            gridpanel.add_widget(lineimage)
+            for _, str_word in (dataglp.get_all_word()).iteritems():
+                checkpanel = BoxLayout(orientation='horizontal', size_hint_x=None, size_hint_y=None, height= 55, width= gridpanel.width)
+                checkbox = CheckBox(size_hint_x=None,size_hint_y=None, width=75, height=55, active= True)
+                lists_id["configpanel" + str(index)] = checkbox
+                checkpanel.add_widget(checkbox)
+                label = Label(text=str_word, font_size= 26, color=[0.23,0.23,0.23,1], size_hint_x=None, size_hint_y=None, height=55, width= gridpanel.width, valign= 'middle', max_lines = 1)
+                label.text_size= label.size
+                checkpanel.add_widget(label)
+                gridpanel.add_widget(checkpanel)
+            
+            with self.canvas.before:
+                self.rect = Rectangle(source=os.path.join(imgdir,'commentpanel.png'), size=self.size, pos=self.pos)
+            self.add_widget(gridpanel)
 
     def make_config_panel_list(self, funcname):
         # 生成したいチェックボックスを作る
-        if funcname == "func7":
+        if funcname == "func1" or funcname == "func4" or funcname == "func5" or funcname == "func9" or funcname == "func10":
+            lists = ["10秒", "1分", "10分", "1時間"]
+            word = "刻み秒数"
+            num = 6
+        elif funcname == "func2":
+            lists = dataglp.get_all_word()
+            word = "表示単語"
+            num = len(lists) + 2
+        elif funcname == "func3":
+            lists = dataglp.get_all_contributor()
+            word = "表示単語"
+            num = len(lists) + 2
+        elif funcname == "func6":
+            lists = ["上位5位", "上位10位"]
+            word = "表示単語"
+            num = 4
+        elif funcname == "func7" or funcname == "func8" or funcname == "func11":
             lists = ["ポジティブ", "ネガティブ", "ニュートラル", "NULL"]
-        if funcname == "":
-            lists = []
+            word = "表示グラフ"
+            num = 6
         else:
             lists = []
-        self.make_pozinega_config_panel(lists)
+            word = ""
+            num = 0
+        self.make_pozinega_config_panel(lists, word, num)
 
 
 class GraphView(BoxLayout):
@@ -160,6 +214,8 @@ class GraphView(BoxLayout):
         # グラフをウィジェットとして追加する
         #widget = FigureCanvasKivyAgg(self.fig)
         #self.add_widget(widget)
+        dataglp.switch_graph(self.fig, title="", graph_name = "nodata") 
+
         widget = FigureCanvasKivyAgg(self.fig)
         self.add_widget(widget)
 
@@ -197,6 +253,9 @@ class GraphView(BoxLayout):
         #dataglp.init_graph(df)
         # 最初のグラフを出力
         self.update_view(df, "func1")
+        app= App.get_running_app()
+        configpanel = app.root.ids.conpanel
+        configpanel.make_config_panel_list("func1")
     
     def load_scrapingdata(self):
         print("scraper start!")
@@ -209,6 +268,9 @@ class GraphView(BoxLayout):
         print("scraper end!!!")
         print(df)
         self.update_view(df, "func1")
+        app= App.get_running_app()
+        configpanel = app.root.ids.conpanel
+        configpanel.make_config_panel_list("func1")
 
     def update_view(self, df, funcname):
 
@@ -268,7 +330,7 @@ class GraphView(BoxLayout):
         elif funcname == "func3":
             # コメントの多い投稿者の表示
             print("コメントの多い投稿者 play")
-            dataglp.switch_graph(self.fig, "コメントの多い投稿者", "bargraph_contributor")
+            dataglp.switch_graph(self.fig, "投稿者ごとのコメント数", "bargraph_contributor")
         elif funcname == "func4":
             # 笑いの推移の表示
             print("笑いの推移 play")
@@ -296,11 +358,11 @@ class GraphView(BoxLayout):
         elif funcname == "func10":
             # 参照URLランキングの表示
             print("func10 play")
-            dataglp.switch_graph(self.fig, "入退室棒グラフ2", "bargraph_nyuutaisitu2")
+            dataglp.switch_graph(self.fig, "ポジネガ単語積立棒グラフ", "bargraph_negapozi_funded")
         elif funcname == "func11":
             # 参照URLランキングの表示
             print("func11 play")
-            dataglp.switch_graph(self.fig, "ポジティブ・ネガティブな単語の割合", "piegraph_negapozi")
+            dataglp.switch_graph(self.fig, title="ポジティブ・ネガティブな単語の割合", graph_name ="piegraph_negapozi")
 
 class PopupChooseFile(BoxLayout):
  
@@ -446,7 +508,7 @@ class ShowWidget(Widget):
         graphpanel.load_data()
 
         configpanel = self.ids.conpanel
-        configpanel.make_config_panel(["tagai","hamada"])
+        #configpanel.make_config_panel(["tagai","hamada"])
 
 class CommentShowApp(App):
     """アプリの管理をするスクリプト"""
